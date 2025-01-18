@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+
+<!--______________  -->
+<!--     light       -->
+<!--______________  -->
+
+    <!--    Main    -->
+    <color name="colorPrimaryLight">#2196F3</color>
+    <color name="colorSecondaryLight">#FFAB40</color>
+
+    <!-- Background Colors -->
+    <color name="backgroundLightPrimary">#FFFFFF</color> <!-- Main background -->
+    <color name="backgroundLightSecondary">#7E7C7C</color> <!-- For cards and surfaces -->
+
+    <!-- Text Colors -->
+    <color name="textLightPrimary">#000000</color> <!-- Primary text -->
+    <color name="textLightSecondary">#FFFFFF</color> <!-- Secondary text -->
+    <color name="textLightHint">#9E9E9E</color> <!-- Hint or disabled text -->
+
+    <!-- Accent Colors -->
+    <color name="errorLight">#F44336</color> <!-- For errors -->
+    <color name="successLight">#43A047</color> <!-- For success messages -->
+
+    <!-- Toolbar Color -->
+    <color name="toolbarLight">#26C6DA</color> <!-- Toolbar background -->
+
+    <!-- Divider/Stroke Color -->
+    <color name="dividerLight">#000000</color> <!-- Subtle divider color -->
+
+    <color name="UtilsLight">#4CAF50</color>
+
+    <!-- Container -->
+    <color name="ContainerBottomLight">#FFFFFF</color>
+    <color name="ContainerTopLight">#AB47BC</color>
+
+<!--______________  -->
+<!--     dark       -->
+<!--______________  -->
+    <!--    Main    -->
+    <color name="colorPrimaryDark">#1976D2</color>
+    <color name="colorSecondaryDark">#C0CA33</color>
+
+    <!-- Background Colors -->
+    <color name="backgroundDarkPrimary">#121212</color>
+    <color name="backgroundDarkSecondary">#1E1E1E</color>
+
+    <!-- Accent Colors -->
+    <color name="errorDark">#D32F2F</color> <!-- For errors -->
+    <color name="successDark">#357E38</color> <!-- For success messages -->
+
+    <!-- Text Colors -->
+    <color name="textDarkPrimary">#E0E0E0</color>
+    <color name="textDarkSecondary">#000000</color>
+    <color name="darkHintText">#9E9E9E</color>
+
+    <!-- Toolbar Color -->
+    <color name="toolbarDark">#121212</color>
+
+    <!-- Divider/Stroke Color -->
+    <color name="dividerDark">#FFFFFF</color>
+
+    <color name="utilsDark">#616161</color>
+
+
+
+    <!-- Container -->
+    <color name="ContainerBottomDark">#000000</color>
+    <color name="ContainerTopDark">#00008A</color>
+
+    <!--google-->
+    <color name="btnGoogleColorStart">#D89A0C</color>
+    <color name="btnGoogleColorEnd">#B3312B</color>
+    <color name="btnGoogleColorMid1">#1E7537</color>
+    <color name="btnGoogleColorMid2">#235FAF</color>
+
+
+
+    <!-- event colors -->
+    <!-- Accent/Event Colors -->
+    <color name="eventPurpleDark">#BF5AF2</color> <!-- Bright purple -->
+    <color name="eventPinkDark">#FF2D55</color> <!-- Vibrant pink -->
+    <color name="eventOrangeDark">#FF9F0A</color> <!-- Warm orange -->
+    <color name="eventRedDark">#FF453A</color> <!-- Bright red -->
+    <color name="eventGreenDark">#30D158</color> <!-- Apple green -->
+    <color name="eventBlueDark">#0A84FF</color> <!-- Primary blue -->
+</resources>

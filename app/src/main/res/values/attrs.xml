@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom theme attributes -->
+    <attr name="colorBackground" format="color" />
+    <attr name="colorBackgroundSecondary" format="color" />
+
+    <attr name="colorError" format="color" />
+
+    <attr name="colorPrimaryText" format="color" />
+    <attr name="colorSecondaryText" format="color" />
+    <attr name="colorHintText" format="color" />
+
+    <attr name="colorToolbar" format="color" />
+
+    <attr name="colorDivider" format="color" />
+    <attr name="colorUtils" format="color" />
+
+    <attr name="containerBottomColor" format="color"/>
+    <attr name="containerTopColor" format="color"/>
+
+    <attr name="btnGoogleColorStart" format="color" />
+    <attr name="btnGoogleColorEnd" format="color" />
+    <attr name="btnGoogleColorMid1" format="color" />
+    <attr name="btnGoogleColorMid2" format="color" />
+
+
+    <attr name="eventColor1" format="color" />
+    <attr name="eventColor2" format="color" />
+    <attr name="eventColor3" format="color" />
+    <attr name="eventColor4" format="color" />
+    <attr name="eventColor5" format="color" />
+    <attr name="eventColor6" format="color" />
+
+</resources>

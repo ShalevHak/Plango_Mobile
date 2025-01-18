@@ -1,0 +1,32 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.CalendarApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorBackground">@color/backgroundDarkPrimary</item>
+        <item name="colorBackgroundSecondary">@color/backgroundDarkSecondary</item>
+        <item name="colorError">@color/errorDark</item>
+
+        <item name="colorPrimaryText">@color/textDarkPrimary</item>
+        <item name="colorSecondaryText">@color/textDarkSecondary</item>
+        <item name="colorHintText">@color/darkHintText</item>
+
+        <item name="colorToolbar">@color/toolbarDark</item>
+        <item name="colorDivider">@color/dividerDark</item>
+        <item name="colorUtils">@color/utilsDark</item>
+
+        <item name="containerBottomColor">@color/ContainerBottomDark</item>
+        <item name="containerTopColor">@color/ContainerTopDark</item>
+
+        <item name="btnGoogleColorStart">@color/btnGoogleColorStart</item>
+        <item name="btnGoogleColorEnd">@color/btnGoogleColorEnd</item>
+        <item name="btnGoogleColorMid1">@color/btnGoogleColorMid1</item>
+        <item name="btnGoogleColorMid2">@color/btnGoogleColorMid2</item>
+
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
+        <item name="colorSecondary">@color/colorSecondaryDark</item>
+
+        <item name="android:fontFamily">@font/lexend</item>
+        <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
+
+    </style>
+
+</resources>

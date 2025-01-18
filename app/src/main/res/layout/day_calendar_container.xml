@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <!-- TabLayout for Days, Weeks, or Months -->
+    <LinearLayout
+        android:id="@+id/llDayTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:orientation="horizontal"
+        app:tabIndicatorColor="?attr/colorBackgroundSecondary"
+        app:tabSelectedTextColor="?attr/colorHintText"
+        app:tabTextColor="?attr/colorSecondaryText"
+        app:tabMode="fixed">
+        <TextView
+            android:layout_margin="5dp"
+            android:id="@+id/tvDayOfMonth"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:text=""
+            android:textAlignment="center"
+            android:paddingTop="2dp"
+            android:background="@drawable/circle_background"
+            android:textSize="30dp"/>
+
+        <TextView
+            android:id="@+id/tvMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="TextView" />
+        <TextView
+            android:id="@+id/tvYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:layout_marginHorizontal="10dp"
+            android:text="TextView" />
+
+    </LinearLayout>
+
+    <!-- ViewPager2 for Events -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpDays"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
