@@ -1,10 +1,6 @@
-package com.example.calendarapp.Controllers;
+package com.example.calendarapp.oldCalendars;
 
 import androidx.viewpager2.widget.ViewPager2;
-
-import com.example.calendarapp.Adapters.CalendarPagerAdapter;
-import com.example.calendarapp.Components.Calendars.AbstractCalendar;
-import com.example.calendarapp.Components.Calendars.CalendarContainer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

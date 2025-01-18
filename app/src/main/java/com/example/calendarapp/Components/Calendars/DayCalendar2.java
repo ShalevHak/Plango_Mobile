@@ -23,7 +23,6 @@ public class DayCalendar2 extends LinearLayout implements IComponent {
     private TextView tvDayOfMonth, tvMonth, tvYear;
     private ViewPager2 viewPager;
     private Calendar currentCalendar;
-    private List<Date> visibleDates;
     private int pagerPos;
 
     private CalendarDayPagerAdapter adapter;

@@ -10,8 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.calendarapp.API.Interfaces.Event;
-import com.example.calendarapp.Components.Calendars.CalendarContainer;
-import com.example.calendarapp.Controllers.CalendarCoordinator;
 import com.example.calendarapp.R;
 
 import org.jetbrains.annotations.Nullable;
@@ -22,8 +20,6 @@ import java.util.Date;
 import java.util.List;
 
 public class CalendarFragment extends Fragment {
-    private CalendarContainer calendarContainer;
-    private CalendarCoordinator calendarCoordinator;
 
     @Nullable
     @Override

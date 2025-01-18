@@ -1,4 +1,4 @@
-package com.example.calendarapp.Adapters;
+package com.example.calendarapp.oldCalendars;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.calendarapp.API.Interfaces.Event;
-import com.example.calendarapp.Components.Calendars.AbstractCalendar;
 import com.example.calendarapp.R;
 
 import java.text.SimpleDateFormat;

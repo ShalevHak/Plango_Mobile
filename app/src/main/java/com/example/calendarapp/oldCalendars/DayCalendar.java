@@ -1,4 +1,4 @@
-package com.example.calendarapp.Components.Calendars;
+package com.example.calendarapp.oldCalendars;
 
 import com.example.calendarapp.API.Interfaces.Event;
 
