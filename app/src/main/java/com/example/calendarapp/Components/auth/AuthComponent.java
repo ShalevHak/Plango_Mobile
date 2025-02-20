@@ -56,7 +56,7 @@ public class AuthComponent extends LinearLayout implements IComponent {
         addView(signUpView); // Add Sign-Up layout (hidden by default)
 
 
-        InitViews();
+        initViews();
 
         // Show the default layout
         toggleMode(isSignIn);
@@ -114,7 +114,7 @@ public class AuthComponent extends LinearLayout implements IComponent {
         String password = etPassword.getText().toString();
         setClickableButtons(false);
         // Add your sign-in logic here
-        this.api.usersService.Login(email,password,new UsersService.AuthCallback() {
+        this.api.usersService.login(email,password,new UsersService.AuthCallback() {
             @Override
             public void onSuccess() {
                 Log.i("LOGIN", "Login successful!");
@@ -155,7 +155,7 @@ public class AuthComponent extends LinearLayout implements IComponent {
             return;
         }
         setClickableButtons(false);
-        this.api.usersService.SignUp(name, email, password, confirmPassword, new UsersService.AuthCallback() {
+        this.api.usersService.signup(name, email, password, confirmPassword, new UsersService.AuthCallback() {
             @Override
             public void onSuccess() {
                 Log.i("SIGNUP", "Sign up successful!");
@@ -186,10 +186,10 @@ public class AuthComponent extends LinearLayout implements IComponent {
         isSignIn = !isSignIn;
         googleAutoComponent.setIsSignIn(isSignIn);
         toggleMode(isSignIn);
-        InitViews();
+        initViews();
     }
 
-    private void InitViews() {
+    private void initViews() {
         // Initialize views in each layout
         if(isSignIn){
             initSignInViews(signInView);

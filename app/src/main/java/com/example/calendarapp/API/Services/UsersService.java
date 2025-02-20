@@ -6,7 +6,6 @@ import com.example.calendarapp.API.FetchingHelpers.UsersHelper;
 import com.example.calendarapp.API.RequestsBody.LoginBody;
 import com.example.calendarapp.API.RequestsBody.SignUpBody;
 import com.example.calendarapp.API.Responses.AuthResponse;
-import com.example.calendarapp.API.Responses.LogoutResponse;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -36,7 +35,7 @@ public class UsersService {
         void onSuccess();
         void onError(String errorMessage);
     }
-    public void Login(String email, String password, AuthCallback callback){
+    public void login(String email, String password, AuthCallback callback){
         Call<AuthResponse> call = fetchingHelper.login(new LoginBody(email,password));
         Log.i("LOGIN","Login");
 
@@ -85,7 +84,7 @@ public class UsersService {
             }
         });
     }
-    public void SignUp(String name, String email, String password, String passwordConfirm, AuthCallback callback) {
+    public void signup(String name, String email, String password, String passwordConfirm, AuthCallback callback) {
         Call<AuthResponse> call = fetchingHelper.signup(new SignUpBody(name,email,password,passwordConfirm));
         Log.i("SIGNUP","Sign up");
 

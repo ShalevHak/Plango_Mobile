@@ -3,16 +3,32 @@ package com.example.calendarapp.Components.Calendars;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
+import com.example.calendarapp.Utils.ThemeUtils;
+
+import java.util.Calendar;
+import java.util.List;
 
 public class DayComponent extends LinearLayout implements IComponent {
+    private LinearLayout hourBackground;
+    private LinearLayout fullDayEventContainer;
+
+    private FrameLayout eventContainer;
+    private ScrollView svDay;
+    private HorizontalScrollView hsvFullDayEvents;
+
 
     public DayComponent(Context context) {
         super(context);
@@ -36,66 +52,54 @@ public class DayComponent extends LinearLayout implements IComponent {
     @Override
     public void initComponent(Context context) {
         inflate(context, R.layout.day_component, this);
-        LinearLayout day = findViewById(R.id.llDay);
-        LinearLayout hourContainer = createHourContainer();
+        hourBackground = findViewById(R.id.llHourBackground);
+        eventContainer = findViewById(R.id.flEventContainer);
+        svDay = findViewById(R.id.svDay);
+        hsvFullDayEvents = findViewById(R.id.hsvFullDayEvents);
+        fullDayEventContainer = findViewById(R.id.llFullDayEvents);
 
-        // Add the hour container to the ScrollView
-        day.addView(hourContainer);
+        hourBackground.removeAllViews();
+        eventContainer.removeAllViews();
+        fullDayEventContainer.removeAllViews();
+
+        // Add the hour background to the ScrollView
+        createHourBackground();
     }
-
-    private LinearLayout createHourContainer() {
-        // Create LinearLayout to hold the 24-hour blocks
-        LinearLayout hourContainer = new LinearLayout(getContext());
-        hourContainer.setOrientation(LinearLayout.VERTICAL);
-        hourContainer.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        hourContainer.setPadding(8, 8, 8, 8);
-
-        // Add all 24 hours dynamically
+    private void createHourBackground() {
         for (int i = 0; i < 24; i++) {
-            hourContainer.addView(createHourBlock(getContext(), i));
+            TextView hourLabel = new TextView(getContext());
+            hourLabel.setText(formatHour(i));
+            hourLabel.setPadding(16, 32, 16, 32);  // Taller for visibility
+            hourLabel.setBackgroundColor(ThemeUtils.resolveColorFromTheme(getContext(),R.attr.colorBackground));
+            hourLabel.setTextColor(ThemeUtils.resolveColorFromTheme(getContext(),R.attr.colorPrimaryText));
+            hourLabel.setGravity(Gravity.CENTER_VERTICAL);
+            hourLabel.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    200)); // Fixed height for consistent scaling
+
+            hourBackground.addView(hourLabel);
         }
-        return hourContainer;
     }
+    public void addEvents(List<Event> events) {
+        for (Event event : events) {
+            if(event.isFullDay()){
+                addFullDayEventBlock(event);
+            }
+            else{
+                addEventBlock(event);
+            }
 
-    private LinearLayout createHourBlock(Context context, int hour) {
-        // Create a container for each hour block
-        LinearLayout hourBlock = new LinearLayout(context);
-        hourBlock.setOrientation(LinearLayout.HORIZONTAL);
-        hourBlock.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        hourBlock.setPadding(8, 8, 8, 8);
-        hourBlock.setWeightSum(10);
-
-        // Add hour label (e.g., "12 AM", "1 PM")
-        TextView hourLabel = new TextView(context);
-        hourLabel.setLayoutParams(new LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                1));
-        hourLabel.setText(formatHour(hour));
-        hourLabel.setTextSize(16);
-        hourLabel.setTextColor(Color.BLACK);
-
-        // Add event placeholder
-        TextView eventPlaceholder = new TextView(context);
-        eventPlaceholder.setLayoutParams(new LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                9));
-        eventPlaceholder.setText("No Events");
-        eventPlaceholder.setTextSize(14);
-        eventPlaceholder.setTextColor(Color.GRAY);
-        eventPlaceholder.setPadding(8, 0, 0, 0);
-        eventPlaceholder.setBackgroundColor(Color.WHITE);
-
-        // Add hour label and event placeholder to the hour block
-        hourBlock.addView(hourLabel);
-        hourBlock.addView(eventPlaceholder);
-
-        return hourBlock;
+        }
+    }
+    private void addEventBlock(Event event) {
+        EventComponent2 eventComponent = new EventComponent2(getContext());
+        eventComponent.initEvent(event,200);
+        eventContainer.addView(eventComponent);
+    }
+    private void addFullDayEventBlock(Event event){
+        EventComponent2 eventComponent = new EventComponent2(getContext());
+        eventComponent.initFullDayEvent(event);
+        fullDayEventContainer.addView(eventComponent);
     }
     private static String formatHour(int hour) {
         // Convert 24-hour format to 12-hour format with AM/PM
@@ -105,4 +109,12 @@ public class DayComponent extends LinearLayout implements IComponent {
     }
 
 
+    public void clearEvents() {
+        eventContainer.removeAllViews();
+        fullDayEventContainer.removeAllViews();
+    }
+
+    public void resetScroller() {
+        svDay.scrollTo(0, 0);
+    }
 }

@@ -12,7 +12,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.example.calendarapp.API.Interfaces.Event;
-import com.example.calendarapp.Components.CustomContainerComponent;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.ThemeUtils;

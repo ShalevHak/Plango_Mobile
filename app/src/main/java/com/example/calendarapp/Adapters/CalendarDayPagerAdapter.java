@@ -2,6 +2,7 @@ package com.example.calendarapp.Adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,18 +12,21 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Calendars.DayComponent;
 import com.example.calendarapp.R;
+import com.example.calendarapp.Services.CalendarService;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 
 public class CalendarDayPagerAdapter extends RecyclerView.Adapter<CalendarDayPagerAdapter.ViewHolder>{
-    private Calendar calendar;
+    private CalendarService calendarService;
     public CalendarDayPagerAdapter() {
-        calendar = Calendar.getInstance();
+        calendarService = CalendarService.getInstance();
     }
     @NonNull
     @Override
@@ -42,23 +46,27 @@ public class CalendarDayPagerAdapter extends RecyclerView.Adapter<CalendarDayPag
 
     @Override
     public void onBindViewHolder(@NonNull CalendarDayPagerAdapter.ViewHolder holder, int position) {
-        holder.bind(position); // Populate content for the date
+        List<Event> events = calendarService.GetCurrentDayEvent();
+        holder.bind(position, events);
     }
 
     @Override
     public int getItemCount() {
         return 3;
     }
-    public void updateCalendar(int offSet){
-        calendar.add(Calendar.DAY_OF_MONTH, offSet);
-    }
+
     protected static class ViewHolder extends RecyclerView.ViewHolder {
         private static int count;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
         }
 
-        void bind(int pos) {
+        public void bind(int position, List<Event> events ) {
+            ((DayComponent) itemView).clearEvents();
+            if(position!= 1)return;
+            Log.i("ADAPTER","binding view");
+            ((DayComponent) itemView).resetScroller();
+            ((DayComponent) itemView).addEvents(events);
         }
     }
 }

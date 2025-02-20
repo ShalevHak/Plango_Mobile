@@ -43,6 +43,9 @@ public class ContentActivity extends AppCompatActivity {
         this.toolbar = findViewById(R.id.tbMain);
         this.toolbar.setFragmentContainer(flFragmentContainer);
         this.toolbar.setFragmentManager(fragmentManager);
+
+        // Disables the back button by setting the callback to 'false' (disabled).
+        // This prevents the back button from performing any action.
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {

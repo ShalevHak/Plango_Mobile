@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.example.calendarapp.API.API;
 import com.example.calendarapp.Components.Interfaces.IComponent;
+import com.example.calendarapp.oldCalendars.CustomContainerComponent;
 
 public class GroupsComponent extends CustomContainerComponent implements IComponent {
     private API api;

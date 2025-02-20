@@ -1,12 +1,9 @@
-package com.example.calendarapp.Components;
+package com.example.calendarapp.oldCalendars;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 

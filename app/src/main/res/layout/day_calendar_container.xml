@@ -21,6 +21,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:text=""
+            android:textColor="@color/white"
             android:textAlignment="center"
             android:paddingTop="2dp"
             android:background="@drawable/circle_background"
@@ -31,10 +32,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textColor="@color/white"
             android:text="TextView" />
         <TextView
             android:id="@+id/tvYear"
             android:layout_width="wrap_content"
+            android:textColor="@color/white"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
             android:layout_marginHorizontal="10dp"

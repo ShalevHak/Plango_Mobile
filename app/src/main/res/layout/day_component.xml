@@ -3,21 +3,48 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-
-    <ScrollView
+    <!-- Full-Day Events Scrollable Row -->
+    <HorizontalScrollView
+        android:id="@+id/hsvFullDayEvents"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:scrollbars="none">
 
         <LinearLayout
-            android:id="@+id/llDay"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
+            android:id="@+id/llFullDayEvents"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp">
+            android:orientation="horizontal"
+            android:padding="8dp"/>
+    </HorizontalScrollView>
+    <ScrollView
+            android:id="@+id/svDay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        </LinearLayout>
+        <FrameLayout
+            android:id="@+id/flDayContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Background: Hour Markers -->
+            <LinearLayout
+                android:id="@+id/llHourBackground"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Foreground: Events Overlay -->
+            <FrameLayout
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:id="@+id/flEventContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </FrameLayout>
     </ScrollView>
-
 </LinearLayout>
