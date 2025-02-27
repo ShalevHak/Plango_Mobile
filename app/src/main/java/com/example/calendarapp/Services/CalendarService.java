@@ -19,7 +19,7 @@ public class CalendarService{
         this.currentCalendar = Calendar.getInstance();
     }
     public List<Event> GetCurrentDayEvent() {
-        Date today = currentCalendar.getTime();
+        Date today = GetCurrentDay();
 
         // Filter events that occur today using isEventOnDate
         return API.api().activitiesService.getEvents()
@@ -45,5 +45,9 @@ public class CalendarService{
 
     public Calendar getCurrentCalendar() {
         return currentCalendar;
+    }
+
+    public Date GetCurrentDay() {
+        return currentCalendar.getTime();
     }
 }

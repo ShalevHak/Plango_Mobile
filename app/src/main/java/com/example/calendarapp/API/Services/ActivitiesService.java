@@ -46,6 +46,34 @@ public class ActivitiesService {
         events.add(new Event("Team Lunch", parseDate("2025-01-30 12:30"), parseDate("2025-01-30 14:00")));
         events.add(new Event("Leadership Offsite", parseDate("2025-01-31 07:00"), parseDate("2025-02-02 19:00")));
 
+
+
+        events.add(new Event("Conference Kickoff", parseDate("2025-02-20 09:00"), parseDate("2025-02-20 12:00")));
+        events.add(new Event("Team Strategy Session", parseDate("2025-02-20 10:30"), parseDate("2025-02-20 12:30")));
+        events.add(new Event("Networking Lunch", parseDate("2025-02-20 12:00"), parseDate("2025-02-20 13:30")));
+        events.add(new Event("Panel Discussion", parseDate("2025-02-20 13:00"), parseDate("2025-02-20 15:00")));
+
+        events.add(new Event("Product Demo", parseDate("2025-02-21 09:00"), parseDate("2025-02-21 10:30")));
+        events.add(new Event("Customer Feedback Session", parseDate("2025-02-21 10:00"), parseDate("2025-02-21 11:30")));
+        events.add(new Event("Innovation Workshop", parseDate("2025-02-21 11:00"), parseDate("2025-02-21 12:30")));
+        events.add(new Event("Investor Meeting", parseDate("2025-02-21 12:00"), parseDate("2025-02-21 13:00")));
+
+        events.add(new Event("Keynote Speech", parseDate("2025-02-22 08:30"), parseDate("2025-02-22 11:00")));
+        events.add(new Event("Breakout Session 1", parseDate("2025-02-22 9:00"), parseDate("2025-02-22 11:30")));
+        events.add(new Event("Breakout Session 2", parseDate("2025-02-22 10:15"), parseDate("2025-02-22 11:45")));
+        events.add(new Event("Breakout Session 3", parseDate("2025-02-22 10:30"), parseDate("2025-02-22 12:00")));
+        events.add(new Event("Networking Event", parseDate("2025-02-22 15:00"), parseDate("2025-02-22 17:00")));
+
+        events.add(new Event("Roundtable Discussion", parseDate("2025-02-23 09:00"), parseDate("2025-02-23 11:00")));
+        events.add(new Event("Expert Q&A Panel", parseDate("2025-02-23 11:00"), parseDate("2025-02-23 12:30")));
+        events.add(new Event("Sponsor Showcase", parseDate("2025-02-23 13:00"), parseDate("2025-02-23 14:30")));
+        events.add(new Event("Closing Remarks", parseDate("2025-02-23 17:00"), parseDate("2025-02-23 18:00")));
+
+        events.add(new Event("VIP Dinner", parseDate("2025-02-24 19:00"), parseDate("2025-02-24 22:00")));
+        events.add(new Event("Hackathon", parseDate("2025-02-24 08:00"), parseDate("2025-02-25 20:00")));
+        events.add(new Event("All-Day Coding Workshop", parseDate("2025-02-25 09:00"), parseDate("2025-02-25 17:00")));
+        events.add(new Event("Tech Demo", parseDate("2025-02-25 10:00"), parseDate("2025-02-25 12:00")));
+        events.add(new Event("Wrap-Up Discussion", parseDate("2025-02-25 16:00"), parseDate("2025-02-25 17:30")));
         return events;
     }
 

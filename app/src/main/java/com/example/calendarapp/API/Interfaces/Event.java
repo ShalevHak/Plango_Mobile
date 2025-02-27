@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.function.Function;
 
 public class Event {
     private String title;
@@ -137,7 +138,16 @@ public class Event {
         return title + " (" + getFormattedStartDate() + " - " + getFormattedEndDate() + ")";
     }
     // Checks if two events overlap
-    public boolean overlapsWith(Event other) {
+    public boolean overlaps(Event other) {
         return !(this.endDate.before(other.startDate) || this.startDate.after(other.endDate));
     }
+
+    public boolean startBefore(Event other){
+        return this.startDate.before(other.startDate);
+    }
+    public boolean endBefore(Event other){
+        return this.endDate.before(other.endDate);
+    }
+
+
 }
