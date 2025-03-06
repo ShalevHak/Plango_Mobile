@@ -1,19 +1,31 @@
 package com.example.calendarapp.API.Responses;
 
-public class AuthResponse {
-    public String status;
-    public String message;
-    public String data;
-    public String error;
-    public String stack;
+import com.google.gson.annotations.SerializedName;
 
+public class AuthResponse {
+    @SerializedName("status")
+    public String status;
+
+    @SerializedName("message")
+    public String message;
+
+    @SerializedName("token") // Ensure this matches the backend response
+    public String token;
+
+    @SerializedName("error")
+    public String error;
+
+    @SerializedName("stack")
+    public String stack;
 
     @Override
     public String toString() {
-        return "LoginResponse{" +
+        return "AuthResponse{" +
                 "status='" + status + '\'' +
                 ", message='" + message + '\'' +
-                ", data='" + data + '\'' +
+                ", token='" + token + '\'' +
+                ", error='" + error + '\'' +
+                ", stack='" + stack + '\'' +
                 '}';
     }
 }

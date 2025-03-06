@@ -8,12 +8,11 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-public interface UsersHelper {
+public interface CalendarHelper {
     @POST("login")
     Call<AuthResponse> login(@Body LoginBody loginBody);
     @POST("signup")
     Call<AuthResponse> signup(@Body SignUpBody signupBody);
     @POST("logout")
     Call<Void> logout();
-
 }

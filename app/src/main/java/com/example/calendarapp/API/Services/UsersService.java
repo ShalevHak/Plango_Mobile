@@ -3,12 +3,15 @@ package com.example.calendarapp.API.Services;
 import android.util.Log;
 
 import com.example.calendarapp.API.FetchingHelpers.UsersHelper;
+import com.example.calendarapp.API.Interceptors.AuthInterceptor;
 import com.example.calendarapp.API.RequestsBody.LoginBody;
 import com.example.calendarapp.API.RequestsBody.SignUpBody;
 import com.example.calendarapp.API.Responses.AuthResponse;
+import com.example.calendarapp.API.TokenManagement.TokenManager;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -16,18 +19,26 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UsersService {
-      private final String USER_URL = "http://10.100.102.201:8000/api/v1-dev/users/";
-//    private final String USER_URL = "http://192.168.43.105:8000/api/v1-dev/users/";
+    //private final String USER_URL = "http://10.100.102.201:8000/api/v1-dev/users/";
+    private final String USER_URL = "http://192.168.130.216:8000/api/v1-dev/users/";
     private Retrofit retrofit ;
     private UsersHelper fetchingHelper;
     public static String token;
 
 
     public UsersService() {
+        TokenManager tokenManager = TokenManager.getInstance();
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new AuthInterceptor(tokenManager)) // Attach JWT to requests
+                .build();
+
         this.retrofit  = new Retrofit.Builder()
                 .baseUrl(USER_URL)
+                .client(client) // Uses OkHttpClient for network requests
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
         this.fetchingHelper = retrofit.create(UsersHelper.class);
     }
 
@@ -45,42 +56,18 @@ public class UsersService {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse data = response.body();
                     Log.i("LOGIN","Response: " + data.toString());
-                    token = data.data;
+                    token = data.token;
+
+                    TokenManager.getInstance().saveToken(token); // Store token globally
                     callback.onSuccess();
                 } else {
-                    String errorMsg = "Error: " + response.code();
-                    try {
-                        if (response.errorBody() != null) {
-                            String errorBody = response.errorBody().string();
-
-                            // Corrected JsonParser usage
-                            JsonParser parser = new JsonParser();
-                            JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
-
-                            // Extract the "message" or "error" field if available
-                            if (jsonObject.has("message")) {
-                                errorMsg = jsonObject.get("message").getAsString();
-                            } else if (jsonObject.has("error")) {
-                                errorMsg = jsonObject.get("error").getAsString();
-                            } else {
-                                errorMsg = errorBody;  // Fallback to raw error body
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        errorMsg = "Error parsing error body";
-                    }
-                    Log.e("LOGIN", errorMsg);
-                    callback.onError(errorMsg);  // Notify error
+                    callback.onError(parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                AuthResponse errorResponse = new AuthResponse();
-                errorResponse.message = "Network Failure: " + t.getMessage();
-                Log.e("LOGIN", errorResponse.message);
-                callback.onError(errorResponse.message);  // Notify network error
+                callback.onError("Network Failure: " + t.getMessage());
             }
         });
     }
@@ -94,46 +81,57 @@ public class UsersService {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse data = response.body();
                     Log.i("SIGNUP","Response: " + data.toString());
-                    token = data.data;
+                    token = data.token;
+
+                    TokenManager.getInstance().saveToken(token); // Store token globally
                     callback.onSuccess();
                 } else {
-                    String errorMsg = "Error: " + response.code();
-                    try {
-                        if (response.errorBody() != null) {
-                            String errorBody = response.errorBody().string();
-
-                            // Corrected JsonParser usage
-                            JsonParser parser = new JsonParser();
-                            JsonObject jsonObject = parser.parse(errorBody).getAsJsonObject();
-
-                            // Extract the "message" or "error" field if available
-                            if (jsonObject.has("message")) {
-                                errorMsg = jsonObject.get("message").getAsString();
-                            } else if (jsonObject.has("error")) {
-                                errorMsg = jsonObject.get("error").getAsString();
-                            } else {
-                                errorMsg = errorBody;  // Fallback to raw error body
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        errorMsg = "Error parsing error body";
-                    }
-                    Log.e("SIGNUP", errorMsg);
-                    callback.onError(errorMsg);  // Notify error
+                    callback.onError(parseError(response));
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                AuthResponse errorResponse = new AuthResponse();
-                errorResponse.message = "Network Failure: " + t.getMessage();
-                Log.e("SIGNIN", errorResponse.message);
-                callback.onError(errorResponse.message);  // Notify network error
+                callback.onError("Network Failure: " + t.getMessage());
             }
         });
     }
-    public void logout(){
-//        Call<LogoutResponse> call = fetchingHelper.logout();
+    public void logout(AuthCallback callback) {
+        Call<Void> call = fetchingHelper.logout();
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    TokenManager.getInstance().clearToken(); // Remove token globally
+                    callback.onSuccess();
+                } else {
+                    callback.onError("Logout failed with status: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                callback.onError("Network Failure: " + t.getMessage());
+            }
+        });
+    }
+
+    private String parseError(Response<?> response) {
+        try {
+            if (response.errorBody() != null) {
+                String errorBody = response.errorBody().string();
+                JsonObject jsonObject = JsonParser.parseString(errorBody).getAsJsonObject();
+                if (jsonObject.has("message")) {
+                    return jsonObject.get("message").getAsString();
+                } else if (jsonObject.has("error")) {
+                    return jsonObject.get("error").getAsString();
+                } else {
+                    return errorBody;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Unknown error";
     }
 }
