@@ -12,11 +12,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.calendarapp.API.API;
+import com.example.calendarapp.API.TokenManagement.TokenManager;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.NetworkUtil;
 
 public class MainActivity extends AppCompatActivity {
-    public static boolean LOGEDIN;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,10 +33,20 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void initActivity() {
+    private void initActivity() { // Initialize globally
+        API.init(this);
         NetworkUtil.registerNetworkCallback(this);
-        if(LOGEDIN){
+
+        // Check if user is logged in (JWT exists)
+        if (isLoggedIn()) {
             startActivity(new Intent(this, ContentActivity.class));
+            finish(); // Close MainActivity so user can't go back to it
         }
+    }
+
+    private boolean isLoggedIn() {
+        // TODO: fix
+        String token = TokenManager.getInstance().getToken();
+        return token != null && !token.isEmpty(); // User is logged in if token exists
     }
 }
