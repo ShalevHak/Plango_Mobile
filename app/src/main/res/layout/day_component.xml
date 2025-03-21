@@ -1,50 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!-- Full-Day Events Scrollable Row -->
-    <HorizontalScrollView
-        android:id="@+id/hsvFullDayEvents"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="true"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:id="@+id/llFullDayEvents"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"/>
-    </HorizontalScrollView>
-    <ScrollView
-            android:id="@+id/svDay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <FrameLayout
-            android:id="@+id/flDayContainer"
+        android:layout_height="match_parent">
+        <!-- Full-Day Events Scrollable Row -->
+        <HorizontalScrollView
+            android:id="@+id/hsvFullDayEvents"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            android:scrollbars="none">
 
-            <!-- Background: Hour Markers -->
             <LinearLayout
-                android:id="@+id/llHourBackground"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:id="@+id/llFullDayEvents"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"/>
+        </HorizontalScrollView>
+        <ScrollView
+            android:id="@+id/svDay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
-            <!-- Foreground: Events Overlay -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_marginStart="50dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:id="@+id/clEventContainer"
+            <FrameLayout
+                android:id="@+id/flDayContainer"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </FrameLayout>
-    </ScrollView>
-</LinearLayout>
+                android:layout_height="wrap_content">
+
+                <!-- Background: Hour Markers -->
+                <LinearLayout
+                    android:id="@+id/llHourBackground"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Foreground: Events Overlay -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_marginStart="50dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:id="@+id/clEventContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- Floating Action Button for Adding Events -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_input_add"
+        android:backgroundTint="?attr/colorPrimary"
+        android:elevation="6dp"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

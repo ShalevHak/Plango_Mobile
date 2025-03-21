@@ -22,6 +22,15 @@
         <item name="btnGoogleColorMid1">#269545</item>
         <item name="btnGoogleColorMid2">#2E7BEC</item>
 
+        // Event Colors
+        <item name="eventColor1">@color/eventColor1Light</item>
+        <item name="eventColor2">@color/eventColor2Light</item>
+        <item name="eventColor3">@color/eventColor3Light</item>
+        <item name="eventColor4">@color/eventColor4Light</item>
+        <item name="eventColor5">@color/eventColor5Light</item>
+        <item name="eventColor6">@color/eventColor6Light</item>
+
+
         <item name="colorPrimary">@color/colorPrimaryLight</item>
         <item name="colorSecondary">@color/colorSecondaryLight</item>
 

@@ -37,12 +37,20 @@
     <color name="ContainerBottomLight">#FFFFFF</color>
     <color name="ContainerTopLight">#AB47BC</color>
 
+    <!-- Event Colors for Light Mode -->
+    <color name="eventColor1Light">#6200EA</color>  <!-- Deep Purple -->
+    <color name="eventColor2Light">#FF4BBE</color>  <!-- Bright Pink -->
+    <color name="eventColor3Light">#FF6D00</color>  <!-- Orange -->
+    <color name="eventColor4Light">#FF2828</color>  <!-- Bright Red -->
+    <color name="eventColor5Light">#00C853</color>  <!-- Bright Green -->
+    <color name="eventColor6Light">#2962FF</color>  <!-- Bright Blue -->
+
 <!--______________  -->
 <!--     dark       -->
 <!--______________  -->
     <!--    Main    -->
     <color name="colorPrimaryDark">#1976D2</color>
-    <color name="colorSecondaryDark">#880E4F</color>
+    <color name="colorSecondaryDark">#E65100</color>
 
     <!-- Background Colors -->
     <color name="backgroundDarkPrimary">#121212</color>
@@ -65,8 +73,6 @@
 
     <color name="utilsDark">#616161</color>
 
-
-
     <!-- Container -->
     <color name="ContainerBottomDark">#000000</color>
     <color name="ContainerTopDark">#00008A</color>
@@ -77,14 +83,12 @@
     <color name="btnGoogleColorMid1">#1E7537</color>
     <color name="btnGoogleColorMid2">#235FAF</color>
 
+    <!-- Event Colors -->
+    <color name="eventColor1Dark">#BF5AF2</color> <!-- Bright purple -->
+    <color name="eventColor2Dark">#FF2D55</color> <!-- Vibrant pink -->
+    <color name="eventColor3Dark">#FF9F0A</color> <!-- Warm orange -->
+    <color name="eventColor4Dark">#B71C1C</color> <!-- Dark red -->
+    <color name="eventColor5Dark">#30D158</color> <!-- Apple green -->
+    <color name="eventColor6Dark">#0A84FF</color> <!-- Primary blue -->
 
-
-    <!-- event colors -->
-    <!-- Accent/Event Colors -->
-    <color name="eventPurpleDark">#BF5AF2</color> <!-- Bright purple -->
-    <color name="eventPinkDark">#FF2D55</color> <!-- Vibrant pink -->
-    <color name="eventOrangeDark">#FF9F0A</color> <!-- Warm orange -->
-    <color name="eventRedDark">#FF453A</color> <!-- Bright red -->
-    <color name="eventGreenDark">#30D158</color> <!-- Apple green -->
-    <color name="eventBlueDark">#0A84FF</color> <!-- Primary blue -->
 </resources>

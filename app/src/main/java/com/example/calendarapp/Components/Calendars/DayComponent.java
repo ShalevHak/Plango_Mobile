@@ -1,5 +1,6 @@
 package com.example.calendarapp.Components.Calendars;
 
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -19,6 +21,7 @@ import com.example.calendarapp.R;
 import com.example.calendarapp.Services.CalendarService;
 import com.example.calendarapp.Utils.ThemeUtils;
 import com.example.calendarapp.Utils.TimeUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,6 +43,7 @@ public class DayComponent extends LinearLayout implements IComponent {
     private ScrollView svDay;
     private HorizontalScrollView hsvFullDayEvents;
     private CalendarService calendarService;
+    private FloatingActionButton fabAddEvent;
 
     public DayComponent(Context context) {
         super(context);
@@ -71,6 +75,31 @@ public class DayComponent extends LinearLayout implements IComponent {
         svDay                  = findViewById(R.id.svDay);
         hsvFullDayEvents       = findViewById(R.id.hsvFullDayEvents);
         fullDayEventContainer  = findViewById(R.id.llFullDayEvents);
+        fabAddEvent            = findViewById(R.id.fabAddEvent);
+
+        // Click Listener for Adding Events
+        fabAddEvent.setOnClickListener(view -> {
+            // Get the current date from the calendar service
+            Date now = calendarService.GetCurrentDay();
+            Calendar startCalendar = Calendar.getInstance();
+            startCalendar.setTime(now);
+
+            // Round to the nearest hour
+            startCalendar.set(Calendar.MINUTE, 0);
+            startCalendar.set(Calendar.SECOND, 0);
+            startCalendar.set(Calendar.MILLISECOND, 0);
+
+            // Set the end time 1 hour later
+            Calendar endCalendar = (Calendar) startCalendar.clone();
+            endCalendar.add(Calendar.HOUR_OF_DAY, 1);
+
+            // Create a new event with the rounded time
+            Event newEvent = new Event("", startCalendar.getTime(), endCalendar.getTime());
+
+            // Open the event editor with this default event
+            EventEditComponent.openEditEventDialog(getContext(), newEvent, this::addNewEvent);
+        });
+
 
         // Clear previous
         hourBackground.removeAllViews();
@@ -115,6 +144,10 @@ public class DayComponent extends LinearLayout implements IComponent {
         List<UIDayEvent> uiDayEvents = organizeEvents(timed);
         if (uiDayEvents == null) return;
 
+        List<UIDayEvent> extras = uiDayEvents.stream().filter((UIDayEvent e)->e.isExtra).collect(Collectors.toList());
+
+
+        uiDayEvents.removeIf((UIDayEvent e)->e.isExtra);
         // 4) Add each to the ConstraintLayout
         for (UIDayEvent uiDayEvent : uiDayEvents) {
             addUIDayEventBlock(uiDayEvent);
@@ -250,7 +283,7 @@ public class DayComponent extends LinearLayout implements IComponent {
                 //TODO: limit the max number of columns to 3
 
                 // Weight is over the limit. Will cause the event to be positioned out side of the screen
-                if (leftMargin > 1) {
+                if (leftMargin + widthWeights.getOrDefault(event,0f) > 1) {
                     extras.add(event);
                     continue;
                 }
@@ -306,11 +339,14 @@ public class DayComponent extends LinearLayout implements IComponent {
         if(event.isExtra)return;
         EventComponent2 eventComponent = new EventComponent2(getContext());
         eventComponent.initOrganizedEvent(event);
+        eventComponent.initParentDay(this);
+
         eventContainer.addView(eventComponent);
     }
     private void addFullDayEventBlock(Event event){
         EventComponent2 eventComponent = new EventComponent2(getContext());
         eventComponent.initFullDayEvent(event);
+        eventComponent.initParentDay(this);
         fullDayEventContainer.addView(eventComponent);
     }
     private static String formatHour(int hour) {
@@ -328,6 +364,17 @@ public class DayComponent extends LinearLayout implements IComponent {
 
     public void resetScroller() {
         svDay.scrollTo(0, 0);
+    }
+    private void addNewEvent(Event event) {
+        calendarService.addEvent(event);
+        clearEvents();
+        addEvents(calendarService.GetCurrentDayEvent());
+    }
+
+    public void editEvent(Event originalEvent, Event editedEvent) {
+        calendarService.updateEvent(originalEvent, editedEvent);
+        clearEvents();
+        addEvents(calendarService.GetCurrentDayEvent());
     }
 
 

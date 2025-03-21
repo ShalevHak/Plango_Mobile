@@ -1,5 +1,7 @@
 package com.example.calendarapp.API.Interfaces;
 
+import com.example.calendarapp.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,7 +15,7 @@ public class Event {
     private Date endDate;
     private Boolean fullDay;
     private int color;
-    private static final int DEFAULT_COLOR = 0xFF6200EE; // Example: Purple
+    public static int DEFAULT_COLOR = R.attr.eventColor1; // Purple
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
 
 
@@ -88,6 +90,9 @@ public class Event {
         long millisInHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
         return durationMillis / (1000f * 60 * 60);
     }
+    public float getDurationMS() {
+        return endDate.getTime() - startDate.getTime();
+    }
     // Returns event start hour (0-23)
     public int getStartHour() {
         Calendar cal = Calendar.getInstance();
@@ -150,4 +155,7 @@ public class Event {
     }
 
 
+    public String getDescription() {
+        return description;
+    }
 }

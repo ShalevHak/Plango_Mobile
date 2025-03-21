@@ -50,4 +50,12 @@ public class CalendarService{
     public Date GetCurrentDay() {
         return currentCalendar.getTime();
     }
+
+    public void addEvent(Event event) {
+        API.api().activitiesService.addEvent(event);
+    }
+
+    public void updateEvent(Event originalEvent, Event editedEvent) {
+        API.api().activitiesService.updateEvent(originalEvent, editedEvent);
+    }
 }
