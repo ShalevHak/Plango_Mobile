@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.calendarapp.Activities.MainActivity;
 
@@ -46,18 +47,29 @@ public class NetworkUtil {
     public static void showInternetDialog(Context context) {
         Log.e("NETWORK", "No internet connection");
         new Handler(Looper.getMainLooper()).post(() -> {
-            new AlertDialog.Builder(context)
-                    .setTitle("No Internet Connection")
-                    .setMessage("Please turn on WIFI or mobile data to continue.")
-                    .setCancelable(false)
-                    .setPositiveButton("Settings", (dialog, which) -> {
-                        context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                    })
-                    .setNegativeButton("Try again", (dialog, which) -> {
-                        dialog.dismiss();
-                        checkInternetConnection(context);
-                    })
-                    .show();
+            try {
+                if (!(context instanceof Activity) || ((Activity) context).isFinishing()) {
+                    // If context is not an activity or the activity is finishing, show a toast instead
+                    Toast.makeText(context, "No Internet Connection. Please check your network settings.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                new AlertDialog.Builder(context)
+                        .setTitle("No Internet Connection")
+                        .setMessage("Please turn on WIFI or mobile data to continue.")
+                        .setCancelable(false)
+                        .setPositiveButton("Settings", (dialog, which) -> {
+                            context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                        })
+                        .setNegativeButton("Try again", (dialog, which) -> {
+                            dialog.dismiss();
+                            checkInternetConnection(context);
+                        })
+                        .show();
+            } catch (Exception e) {
+                Log.e("NETWORK", "Failed to show dialog, showing toast instead", e);
+                Toast.makeText(context, "No Internet Connection. Please check your network settings.", Toast.LENGTH_LONG).show();
+            }
         });
     }
     public static void checkInternetConnection(Context context){
