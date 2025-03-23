@@ -10,7 +10,15 @@ import com.example.calendarapp.API.Services.UsersService;
 import com.example.calendarapp.API.TokenManagement.TokenManager;
 
 public class API {
-    public static final String BASE_URL = "/api/v1-dev/";
+    private static final String PROTOCOL = "http";
+    private static final String API_IP = "192.168.137.1";
+    private static final String API_PORT = "8000";
+    private static final String BASE_ROUTE = "/api/v1-dev/";
+
+    public static String getRoute(String route) {
+        return PROTOCOL + "://" + API_IP + ":" + API_PORT + BASE_ROUTE + route + "/";
+    }
+
     private static API api;
     private static Context context;
     // Service instances

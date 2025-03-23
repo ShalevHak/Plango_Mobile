@@ -2,6 +2,7 @@ package com.example.calendarapp.API.Services;
 
 import android.util.Log;
 
+import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.FetchingHelpers.UsersHelper;
 import com.example.calendarapp.API.Interceptors.AuthInterceptor;
 import com.example.calendarapp.API.Interfaces.Event;
@@ -18,6 +19,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ActivitiesService {
     private final String CALENDAR_URL = "http://192.168.130.216:8000/api/v1-dev/calendars/";
+    private String getEventURL(String calendarID) {
+        return API.getRoute(calendarID + "/" + events);
+    };
     private Retrofit retrofit ;
     private UsersHelper fetchingHelper;
     public static String token;

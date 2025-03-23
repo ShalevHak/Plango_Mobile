@@ -2,6 +2,7 @@ package com.example.calendarapp.API.Services;
 
 import android.util.Log;
 
+import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.FetchingHelpers.UsersHelper;
 import com.example.calendarapp.API.Interceptors.AuthInterceptor;
 import com.example.calendarapp.API.Interfaces.User;
@@ -20,12 +21,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UsersService {
-    //private final String USER_URL = "http://10.100.102.201:8000/api/v1-dev/users/";
-    private final String USER_URL = "http://192.168.137.1:8000/api/v1-dev/users/";
-    private Retrofit retrofit ;
-    private UsersHelper fetchingHelper;
-    public static String token;
-    public static String userID;
+    private final String USER_URL = API.getRoute("users");
+    private final Retrofit retrofit ;
+    private final UsersHelper fetchingHelper;
 
 
     public UsersService() {
@@ -71,10 +69,12 @@ public class UsersService {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse data = response.body();
                     Log.i("LOGIN","Response: " + data.toString());
-                    token = data.token;
-                    userID = data.user.get("id").toString();
+
+                    String token = data.token;
+                    String userID = data.user.get("id").toString();
                     TokenManager.getInstance().saveToken(token); // Store token globally
                     TokenManager.getInstance().saveUserID(userID); // Store userID globally
+
                     callback.onSuccess();
                 } else {
                     callback.onError(parseError(response));
@@ -98,7 +98,11 @@ public class UsersService {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse data = response.body();
                     Log.i("SIGNUP","Response: " + data.toString());
-                    token = data.token;
+
+                    String token = data.token;
+                    String userID = data.user.get("id").toString();
+                    TokenManager.getInstance().saveToken(token); // Store token globally
+                    TokenManager.getInstance().saveUserID(userID); // Store userID globally
 
                     TokenManager.getInstance().saveToken(token); // Store token globally
                     callback.onSuccess();

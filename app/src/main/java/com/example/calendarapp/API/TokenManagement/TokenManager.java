@@ -11,6 +11,9 @@ public class TokenManager {
     private static final String KEY_JWT = "jwt_token";
     private static final String KEY_USERID = "user_id";
 
+    private String token;
+    private String userID;
+
     private TokenManager() {
         // Private constructor to prevent direct instantiation
     }
@@ -31,43 +34,56 @@ public class TokenManager {
         return instance;
     }
 
-    public void saveToken(String token) {
-        if (sharedPreferences == null) {
-            Log.e("TokenManager","sharedPreferences is null");
-            return;
-        }
-        sharedPreferences.edit().putString(KEY_JWT, token).apply();
-    }
 
     public String getToken() {
-        if (sharedPreferences == null) {
-            Log.e("TokenManager","sharedPreferences is null");
-            return "";
+        if (token == null || token.isEmpty()) {
+            if (sharedPreferences == null) {
+                Log.e("TokenManager", "sharedPreferences is null");
+                return "";
+            }
+            token = sharedPreferences.getString(KEY_JWT, "");
         }
-        return sharedPreferences.getString(KEY_JWT, null);
-    }
-    public String getUserID(){
-        if (sharedPreferences == null) {
-            Log.e("TokenManager","sharedPreferences is null");
-            return "";
-        }
-        return sharedPreferences.getString(KEY_USERID, null);
+        return token;
     }
 
+    public String getUserID() {
+        if (userID == null || userID.isEmpty()) {
+            if (sharedPreferences == null) {
+                Log.e("TokenManager", "sharedPreferences is null");
+                return "";
+            }
+            userID = sharedPreferences.getString(KEY_USERID, "");
+        }
+        return userID;
+    }
 
-    public void clearToken() {
+    public void saveToken(String token) {
         if (sharedPreferences == null) {
-            Log.e("TokenManager","sharedPreferences is null");
+            Log.e("TokenManager", "sharedPreferences is null");
             return;
         }
-        sharedPreferences.edit().remove(KEY_JWT).apply();
+        this.token = token;
+        sharedPreferences.edit().putString(KEY_JWT, token).apply();
     }
 
     public void saveUserID(String userID) {
         if (sharedPreferences == null) {
-            Log.e("TokenManager","sharedPreferences is null");
+            Log.e("TokenManager", "sharedPreferences is null");
             return;
         }
+        this.userID = userID;
         sharedPreferences.edit().putString(KEY_USERID, userID).apply();
     }
+
+    public void clearToken() {
+        if (sharedPreferences == null) {
+            Log.e("TokenManager", "sharedPreferences is null");
+            return;
+        }
+        token = null;
+        userID = null;
+        sharedPreferences.edit().remove(KEY_JWT).remove(KEY_USERID).apply();
+    }
+
+
 }
