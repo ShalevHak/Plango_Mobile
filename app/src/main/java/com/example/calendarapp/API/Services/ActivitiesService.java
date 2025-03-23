@@ -1,15 +1,29 @@
 package com.example.calendarapp.API.Services;
 
+import android.util.Log;
+
+import com.example.calendarapp.API.FetchingHelpers.UsersHelper;
+import com.example.calendarapp.API.Interceptors.AuthInterceptor;
 import com.example.calendarapp.API.Interfaces.Event;
+import com.example.calendarapp.API.TokenManagement.TokenManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class ActivitiesService {
-    private List<Event> getSampleEvents() {
-        List<Event> events = new ArrayList<>();
+    private final String CALENDAR_URL = "http://192.168.130.216:8000/api/v1-dev/calendars/";
+    private Retrofit retrofit ;
+    private UsersHelper fetchingHelper;
+    public static String token;
+    private List<Event> events;
+    private  void createSampleEvents() {
+        events = new ArrayList<>();
 
         events.add(new Event("New Year Planning", parseDate("2024-12-30 09:00"), parseDate("2024-12-30 11:00")));
         events.add(new Event("Year-End Review", parseDate("2024-12-31 10:00"), parseDate("2024-12-31 12:00")));
@@ -74,8 +88,27 @@ public class ActivitiesService {
         events.add(new Event("All-Day Coding Workshop", parseDate("2025-02-25 09:00"), parseDate("2025-02-25 17:00")));
         events.add(new Event("Tech Demo", parseDate("2025-02-25 10:00"), parseDate("2025-02-25 12:00")));
         events.add(new Event("Wrap-Up Discussion", parseDate("2025-02-25 16:00"), parseDate("2025-02-25 17:30")));
-        return events;
     }
+
+
+    public ActivitiesService() {
+        // TODO: remove when not needed
+        createSampleEvents();
+
+        TokenManager tokenManager = TokenManager.getInstance();
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new AuthInterceptor(tokenManager)) // Attach JWT to requests
+                .build();
+
+        this.retrofit  = new Retrofit.Builder()
+                .baseUrl(CALENDAR_URL)
+                .client(client) // Uses OkHttpClient for network requests
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        this.fetchingHelper = retrofit.create(UsersHelper.class);
+        }
 
     private Date parseDate(String dateString) {
         try {
@@ -87,7 +120,18 @@ public class ActivitiesService {
         }
     }
     public List<Event> getEvents(){
-        return getSampleEvents();
-        //return new ArrayList<Event>();
+        return events;
     }
+
+    public void addEvent(Event event) {
+        // TODO: update database;
+        Log.i("ActivitiesService","Adding event");
+        events.add(event);
+    }
+
+    public void updateEvent(Event originalEvent, Event editedEvent) {
+        // TODO: update database;
+
+        Log.i("ActivitiesService","Updating event");
+        events.replaceAll(event -> event.equals(originalEvent) ? editedEvent : event);    }
 }
