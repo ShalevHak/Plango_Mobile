@@ -25,7 +25,6 @@ import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.ThemeUtils;
-import com.example.calendarapp.Utils.TimeUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,6 +34,7 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
     private Event event;
     private TextView eventView;
     private static final int MIN_HEIGHT_PX = 50; // Ensure text is always visible
+    private DayComponent parent;
 
     public EventComponent2(Context context) {
         super(context);
@@ -73,6 +73,9 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
             setId(View.generateViewId());
         }
     }
+    public void initParentDay(DayComponent dayComponent){
+        this.parent = dayComponent;
+    }
     public void initFullDayEvent(Event event) {
         this.event = event;
 
@@ -80,7 +83,7 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
 
         Drawable backgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corner_background);
         if (backgroundDrawable != null) {
-            int color = event.getColor() != 0 ? event.getColor() : Color.parseColor("#FF9800");
+            int color = event.getColor() != 0 ? ThemeUtils.resolveColorFromTheme(getContext(),event.getColor()) : Color.parseColor("#FF9800");
             backgroundDrawable.setTint(color);
             this.setBackground(backgroundDrawable);
         }
@@ -108,7 +111,7 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         // Load the rounded corner background
         Drawable backgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corner_background);
         if (backgroundDrawable != null) {
-            int color = event.getColor() != 0 ? event.getColor() : Color.parseColor("red");
+            int color = event.getColor() != 0 ? ThemeUtils.resolveColorFromTheme(getContext(),event.getColor()) : Color.parseColor("red");
             // Apply a red tint to the background drawable
             backgroundDrawable.setTint(color);
             this.setBackground(backgroundDrawable); // Set the tinted drawable as the background
@@ -166,14 +169,14 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
 
         tvStartTime.setText(dateFormat.format(event.getStartDate()));
         tvEndTime.setText(dateFormat.format(event.getEndDate()));
-        //tvDescription.setText(event.getDescription());
+        tvDescription.setText(event.getDescription());
 
         // Create and show the dialog
         androidx.appcompat.app.AlertDialog dialog = dialogBuilder.create();
 
         // Set button actions
         btnEdit.setOnClickListener(v -> {
-            openEditEventDialog(context);
+            openEditEventDialog(context, dialog);
         });
         btnClose.setOnClickListener(v -> {
             // Dismiss the dialog
@@ -215,14 +218,22 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         dialog.show();
     }
 
-    private void openEditEventDialog(Context context) {
-        // Create a dialog for editing the event (this can be replaced with an Activity or Fragment later)
-        androidx.appcompat.app.AlertDialog.Builder editDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        editDialogBuilder.setTitle("Edit Event");
-        editDialogBuilder.setMessage("Edit event functionality is under development.");
-        editDialogBuilder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
-        editDialogBuilder.create().show();
+    private void openEditEventDialog(Context context, androidx.appcompat.app.AlertDialog dialog) {
+        // Create a dialog for editing the event
+        EventEditComponent.openEditEventDialog(
+                context,
+                event,
+                (Event e) -> {
+                    this.editEvent(e);
+                    dialog.dismiss();
+                }
+        );
     }
+
+    private void editEvent(Event event) {
+        parent.editEvent(this.event,event);
+    }
+
     private void applyExpandAnimation(View dialogView) {
         // Set initial scale and alpha values
         dialogView.setScaleX(0.8f);
