@@ -9,6 +9,7 @@ public class TokenManager {
     private static SharedPreferences sharedPreferences;
     private static final String PREF_NAME = "app_prefs";
     private static final String KEY_JWT = "jwt_token";
+    private static final String KEY_USERID = "user_id";
 
     private TokenManager() {
         // Private constructor to prevent direct instantiation
@@ -45,6 +46,14 @@ public class TokenManager {
         }
         return sharedPreferences.getString(KEY_JWT, null);
     }
+    public String getUserID(){
+        if (sharedPreferences == null) {
+            Log.e("TokenManager","sharedPreferences is null");
+            return "";
+        }
+        return sharedPreferences.getString(KEY_USERID, null);
+    }
+
 
     public void clearToken() {
         if (sharedPreferences == null) {
@@ -52,5 +61,13 @@ public class TokenManager {
             return;
         }
         sharedPreferences.edit().remove(KEY_JWT).apply();
+    }
+
+    public void saveUserID(String userID) {
+        if (sharedPreferences == null) {
+            Log.e("TokenManager","sharedPreferences is null");
+            return;
+        }
+        sharedPreferences.edit().putString(KEY_USERID, userID).apply();
     }
 }

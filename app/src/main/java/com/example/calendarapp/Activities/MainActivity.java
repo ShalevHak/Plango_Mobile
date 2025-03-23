@@ -42,11 +42,16 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, ContentActivity.class));
             finish(); // Close MainActivity so user can't go back to it
         }
+        else {
+            API.api().usersService.logout(null);
+        }
     }
 
     private boolean isLoggedIn() {
-        // TODO: fix
+        // TODO: fix - validate token and userID
         String token = TokenManager.getInstance().getToken();
-        return token != null && !token.isEmpty(); // User is logged in if token exists
+        String userID = TokenManager.getInstance().getUserID();
+
+        return userID != null && userID.isEmpty() && token != null && !token.isEmpty(); // User is logged in if token exists
     }
 }

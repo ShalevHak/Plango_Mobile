@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.calendarapp.API.FetchingHelpers.UsersHelper;
 import com.example.calendarapp.API.Interceptors.AuthInterceptor;
+import com.example.calendarapp.API.Interfaces.User;
 import com.example.calendarapp.API.RequestsBody.LoginBody;
 import com.example.calendarapp.API.RequestsBody.SignUpBody;
 import com.example.calendarapp.API.Responses.AuthResponse;
@@ -20,10 +21,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UsersService {
     //private final String USER_URL = "http://10.100.102.201:8000/api/v1-dev/users/";
-    private final String USER_URL = "http://192.168.130.216:8000/api/v1-dev/users/";
+    private final String USER_URL = "http://192.168.137.1:8000/api/v1-dev/users/";
     private Retrofit retrofit ;
     private UsersHelper fetchingHelper;
     public static String token;
+    public static String userID;
 
 
     public UsersService() {
@@ -46,7 +48,20 @@ public class UsersService {
         void onSuccess();
         void onError(String errorMessage);
     }
-    public void login(String email, String password, AuthCallback callback){
+
+    public final AuthCallback defaultAuthCallback = new AuthCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i("AuthCallback","Success");
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("AuthCallback","Error: " + errorMessage);
+            }
+        };
+    public void login(String email, String password, AuthCallback authCallback){
+        final AuthCallback callback = authCallback != null ? authCallback : defaultAuthCallback;
         Call<AuthResponse> call = fetchingHelper.login(new LoginBody(email,password));
         Log.i("LOGIN","Login");
 
@@ -57,8 +72,9 @@ public class UsersService {
                     AuthResponse data = response.body();
                     Log.i("LOGIN","Response: " + data.toString());
                     token = data.token;
-
+                    userID = data.user.get("id").toString();
                     TokenManager.getInstance().saveToken(token); // Store token globally
+                    TokenManager.getInstance().saveUserID(userID); // Store userID globally
                     callback.onSuccess();
                 } else {
                     callback.onError(parseError(response));
@@ -71,7 +87,8 @@ public class UsersService {
             }
         });
     }
-    public void signup(String name, String email, String password, String passwordConfirm, AuthCallback callback) {
+    public void signup(String name, String email, String password, String passwordConfirm, AuthCallback authCallback) {
+        final AuthCallback callback = authCallback != null ? authCallback : defaultAuthCallback;
         Call<AuthResponse> call = fetchingHelper.signup(new SignUpBody(name,email,password,passwordConfirm));
         Log.i("SIGNUP","Sign up");
 
@@ -96,7 +113,8 @@ public class UsersService {
             }
         });
     }
-    public void logout(AuthCallback callback) {
+    public void logout(AuthCallback authCallback) {
+        final AuthCallback callback = authCallback != null ? authCallback : defaultAuthCallback;
         Call<Void> call = fetchingHelper.logout();
         call.enqueue(new Callback<Void>() {
             @Override
