@@ -36,13 +36,8 @@ public class ContentActivity extends AppCompatActivity {
         NetworkUtil.registerNetworkCallback(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
         this.flFragmentContainer = findViewById(R.id.flFragmentContainer);
-        fragmentManager.beginTransaction()
-                .replace(flFragmentContainer.getId(), new UserFragment())
-                .addToBackStack(null) // Optional: Adds the transaction to the back stack
-                .commit();
         this.toolbar = findViewById(R.id.tbMain);
-        this.toolbar.setFragmentContainer(flFragmentContainer);
-        this.toolbar.setFragmentManager(fragmentManager);
+        this.toolbar.initFragmentManagement(flFragmentContainer,fragmentManager);
 
         // Disables the back button by setting the callback to 'false' (disabled).
         // This prevents the back button from performing any action.

@@ -43,7 +43,7 @@ public class GroupActivity extends AppCompatActivity {
                 .addToBackStack(null) // Optional: Adds the transaction to the back stack
                 .commit();
         this.toolbar = findViewById(R.id.tbMain);
-        toolbar.setFragmentContainer(flFragmentContainerGroup);
-        toolbar.setFragmentManager(fragmentManager);
+        // todo: fix
+        this.toolbar.initFragmentManagement(flFragmentContainerGroup,fragmentManager);
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -13,6 +14,8 @@ import android.widget.LinearLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.calendarapp.API.API;
+import com.example.calendarapp.API.Services.UsersService;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.Fragments.CalendarFragment;
 import com.example.calendarapp.Fragments.GroupsFragment;
@@ -24,7 +27,9 @@ import com.example.calendarapp.R;
 public class ToolbarComponent extends LinearLayout implements IComponent {
     private ImageButton btnUser, btnGroups, btnSettings, btnCalendar, btnLogout;
     private FrameLayout flFragmentContainer;
+    private static Class<? extends Fragment> currentFragmentClass;
     private FragmentManager fragmentManager;
+    private static int selectedBtnId;
     public ToolbarComponent(Context context) {
         super(context);
         initComponent(context);
@@ -39,7 +44,6 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
         super(context, attrs, defStyleAttr);
         initComponent(context);
     }
-
 
     private final OnClickListener changeFragment = v -> {
         if (fragmentManager == null || flFragmentContainer == null) return;
@@ -61,8 +65,10 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
         // Perform the fragment transaction
         if (clazz != null) {
             try {
+                selectedBtnId = id;
+                currentFragmentClass = clazz;
                 // Use FragmentFactory to create a new fragment instance to avoid deprecated newInstance()
-                Fragment fragment = clazz.getDeclaredConstructor().newInstance();
+                Fragment fragment = currentFragmentClass.getDeclaredConstructor().newInstance();
 
                 // Replace the current fragment
                 fragmentManager.beginTransaction()
@@ -106,12 +112,29 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
         btnSettings.setOnClickListener(changeFragment);
         btnCalendar.setOnClickListener(changeFragment);
         btnLogout.setOnClickListener(v-> logout());
-        setButtonGreyer(btnUser);
+        if(selectedBtnId == 0){
+            setButtonGreyer(btnUser);
+        }
+        else{
+            setButtonGreyer(findViewById(selectedBtnId));
+        }
+
     }
 
     private void logout() {
         //TODO: use logout service
         navigateToMainActivity();
+        API.api().usersService.logout(new UsersService.AuthCallback() {
+            @Override
+            public void onSuccess() {
+                Log.i("Logout","Logged out");
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("Logout"," Log out error: " + errorMessage);
+            }
+        });
     }
 
     private void navigateToMainActivity() {
@@ -119,11 +142,22 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
         getContext().startActivity(intent);
     }
 
-    public void setFragmentContainer(FrameLayout flFragmentContainer) {
-        this.flFragmentContainer = flFragmentContainer;
+    public void initFragmentManagement(FrameLayout flFragmentContainer,FragmentManager fragmentManager) {
+        if(this.flFragmentContainer == null && this.fragmentManager == null){
+            this.fragmentManager = fragmentManager;
+            this.flFragmentContainer = flFragmentContainer;
+        }
+
+        try{
+            Fragment fragment = currentFragmentClass.getDeclaredConstructor().newInstance();
+            fragmentManager.beginTransaction()
+                    .replace(flFragmentContainer.getId(), fragment)
+                    .addToBackStack(null) // Optional: Adds the transaction to the back stack
+                    .commit();
+        }
+        catch (Exception e){
+            Log.i("Toolbar","Unable to start fragment");
+        }
     }
 
-    public void setFragmentManager(FragmentManager fragmentManager) {
-        this.fragmentManager = fragmentManager;
-    }
 }
