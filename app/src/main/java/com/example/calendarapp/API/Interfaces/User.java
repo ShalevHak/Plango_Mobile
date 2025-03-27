@@ -1,18 +1,34 @@
 package com.example.calendarapp.API.Interfaces;
 
 import androidx.annotation.NonNull;
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
 public class User {
-    static int userCounter = 0, id;
-    public String email, password,name;
+    @SerializedName("_id")
+    public String id;
 
-    public User() {
-        id = userCounter++;
-    }
+    @SerializedName("name")
+    public String name;
 
-    @NonNull
-    @Override
-    public String toString() {
-        return "Email: " + email+"\n Name: "+ name + "\n Password: " + password;
-    }
+    @SerializedName("about")
+    public String about;
+
+    @SerializedName("email")
+    public String email;
+
+    @SerializedName("schedule")
+    public String scheduleId;
+
+    @SerializedName("systemRole")
+    public String systemRole;
+
+    @SerializedName("groups")
+    public List<String> groupIds;
+
+    @SerializedName("coverImgPath")
+    public String coverImgPath;
+
+    // Add constructor, getters, setters as needed
+
 }

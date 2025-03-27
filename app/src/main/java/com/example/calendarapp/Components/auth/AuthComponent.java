@@ -109,33 +109,31 @@ public class AuthComponent extends LinearLayout implements IComponent {
         toggleAutoLink.setClickable(isClickable);
         googleAutoComponent.setClickableGoogleAuthBtn(isClickable);
     }
+
     private void handleSignIn() {
+
+
+
+
         String email = etEmail.getText().toString();
         String password = etPassword.getText().toString();
         setClickableButtons(false);
         // Add your sign-in logic here
-        this.api.usersService.login(email,password,new UsersService.AuthCallback() {
-            @Override
-            public void onSuccess() {
+        this.api.usersService.login(email,password).thenAccept(authResponse -> {
                 Log.i("LOGIN", "Login successful!");
-                // Navigate to the next screen
                 navigateToContentActivity();
                 setClickableButtons(true);
-
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                Log.e("LOGIN", "Login failed: " + errorMessage);
+            })
+            .exceptionally(e -> {
+                Log.e("LOGIN", "Login failed: " + e.getMessage());
                 setClickableButtons(true);
-                // Show error message to the user
                 new AlertDialog.Builder(getContext())
                         .setTitle("Log In Error")
-                        .setMessage(errorMessage)
+                        .setMessage(e.getMessage())
                         .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                         .show();
-            }
-        });
+                return null;
+            });
     }
 
     private void handleSignUp() {
@@ -155,24 +153,22 @@ public class AuthComponent extends LinearLayout implements IComponent {
             return;
         }
         setClickableButtons(false);
-        this.api.usersService.signup(name, email, password, confirmPassword, new UsersService.AuthCallback() {
-            @Override
-            public void onSuccess() {
-                Log.i("SIGNUP", "Sign up successful!");
-                navigateToContentActivity();
-                setClickableButtons(true);
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                setClickableButtons(true);
-                new AlertDialog.Builder(getContext())
-                        .setTitle("Sign Up Error")
-                        .setMessage(errorMessage)
-                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                        .show();
-            }
-        });
+        this.api.usersService.signup(name, email, password, confirmPassword).thenAccept(
+                authResponse -> {
+                    Log.i("SIGNUP", "Sign up successful!");
+                    navigateToContentActivity();
+                    setClickableButtons(true);
+                })
+                .exceptionally(e ->
+                {
+                    setClickableButtons(true);
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Sign Up Error")
+                            .setMessage(e.getMessage())
+                            .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                            .show();
+                    return null;
+                });
     }
 
     public void toggleMode(boolean signIn) {

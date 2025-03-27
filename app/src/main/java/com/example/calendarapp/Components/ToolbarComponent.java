@@ -124,17 +124,10 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
     private void logout() {
         //TODO: use logout service
         navigateToMainActivity();
-        API.api().usersService.logout(new UsersService.AuthCallback() {
-            @Override
-            public void onSuccess() {
-                Log.i("Logout","Logged out");
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                Log.e("Logout"," Log out error: " + errorMessage);
-            }
-        });
+        API.api().usersService.logout().exceptionally(e -> {
+                Log.e("Logout"," Log out error: " + e.getMessage());
+                return null;
+            });
     }
 
     private void navigateToMainActivity() {

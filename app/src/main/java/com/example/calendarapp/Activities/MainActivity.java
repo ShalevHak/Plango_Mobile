@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             finish(); // Close MainActivity so user can't go back to it
         }
         else {
-            API.api().usersService.logout(null);
+            API.api().usersService.logout();
         }
     }
 
