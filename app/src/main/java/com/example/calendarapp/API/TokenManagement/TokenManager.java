@@ -64,15 +64,19 @@ public class TokenManager {
         }
         token = token;
         sharedPreferences.edit().putString(KEY_JWT, token).apply();
+        Log.i("TokenManager", "New token saved");
     }
 
     public void saveUserID(String userID) {
+        userID = userID.replace("\"", "");
         if (sharedPreferences == null) {
             Log.e("TokenManager", "sharedPreferences is null");
             return;
         }
         _userID = userID;
         sharedPreferences.edit().putString(KEY_USERID, userID).apply();
+        Log.i("TokenManager", "New UserID saved: " + _userID);
+
     }
 
     public void clearToken() {

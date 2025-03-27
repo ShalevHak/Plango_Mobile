@@ -19,7 +19,8 @@ public interface UsersHelper {
     Call<AuthResponse> signup(@Body SignUpBody signupBody);
     @POST("logout")
     Call<Void> logout();
-    @GET("users/{id}")
-    Call<UserResponse> getUserById(@Path("id") String id);
+    @GET("{userId}")
+    Call<UserResponse> getUserById(@Path("userId") String userId);
+
 
 }

@@ -50,15 +50,5 @@
             app:srcCompat="@drawable/calendar_icon"
             android:layout_marginHorizontal="15dp"
             app:tint="@color/white" />
-
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:srcCompat="@drawable/user_settings_icon"
-            android:layout_marginHorizontal="15dp"
-            app:tint="@color/white" />
     </LinearLayout>
 </LinearLayout>

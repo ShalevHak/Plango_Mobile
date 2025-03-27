@@ -24,8 +24,10 @@ import com.example.calendarapp.Fragments.UserSettingsFragment;
 import com.example.calendarapp.Activities.MainActivity;
 import com.example.calendarapp.R;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class ToolbarComponent extends LinearLayout implements IComponent {
-    private ImageButton btnUser, btnGroups, btnSettings, btnCalendar, btnLogout;
+    private ImageButton btnUser, btnGroups, btnCalendar, btnLogout;
     private FrameLayout flFragmentContainer;
     private static Class<? extends Fragment> currentFragmentClass;
     private FragmentManager fragmentManager;
@@ -56,8 +58,6 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
             clazz = GroupsFragment.class;
         } else if (id == R.id.btnCalendar) {
             clazz = CalendarFragment.class;
-        } else if (id == R.id.btnSettings) {
-            clazz = UserSettingsFragment.class;
         }
         String tag = (String) getTag(); // Retrieve the tag
 
@@ -67,19 +67,40 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
             try {
                 selectedBtnId = id;
                 currentFragmentClass = clazz;
-                // Use FragmentFactory to create a new fragment instance to avoid deprecated newInstance()
-                Fragment fragment = currentFragmentClass.getDeclaredConstructor().newInstance();
 
-                // Replace the current fragment
-                fragmentManager.beginTransaction()
-                        .replace(flFragmentContainer.getId(), fragment)
-                        .addToBackStack(null) // Optional: Adds the transaction to the back stack
-                        .commit();
+                replaceFragment();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     };
+
+    private void replaceFragment() {
+        try {
+            // Default to User Info Fragment
+            if(currentFragmentClass == null) currentFragmentClass = UserFragment.class;
+
+            Fragment fragment = currentFragmentClass.getDeclaredConstructor().newInstance();
+
+
+
+            // Replace the current fragment
+            fragmentManager.beginTransaction()
+                    .replace(flFragmentContainer.getId(), fragment)
+                    .addToBackStack(null) // Optional: Adds the transaction to the back stack
+                    .commit();
+            // init the fragment
+            if (fragment instanceof IComponent)
+                ((IComponent) fragment).initComponent(fragment.getContext());
+        }catch (Exception e){
+            Log.e("Toolbar","Unable to start fragment: " + e.toString());
+            e.printStackTrace();
+        }
+
+
+    }
+
     private void setButtonGreyer(ImageButton btn) {
         btn.setEnabled(false); // Disable the button to indicate it's inactive
         btn.setColorFilter(Color.parseColor("#AAEEEE")); // Semi-transparent grey color
@@ -88,7 +109,7 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
 
     private void resetAllButtonsButOne(ImageButton activeButton) {
         // Assuming you have a list or array of all the buttons
-        ImageButton[] allButtons = {btnUser, btnGroups, btnCalendar, btnSettings};
+        ImageButton[] allButtons = {btnUser, btnGroups, btnCalendar};
 
         for (ImageButton button : allButtons) {
             if (button != activeButton) {
@@ -104,12 +125,10 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
         LayoutInflater.from(context).inflate(R.layout.toolbar_component,this);
         btnUser = findViewById(R.id.btnUser);
         btnCalendar = findViewById(R.id.btnCalendar);
-        btnSettings = findViewById(R.id.btnSettings);
         btnGroups = findViewById(R.id.btnGroups);
         btnLogout = findViewById(R.id.btnLogout);
         btnGroups.setOnClickListener(changeFragment);
         btnUser.setOnClickListener(changeFragment);
-        btnSettings.setOnClickListener(changeFragment);
         btnCalendar.setOnClickListener(changeFragment);
         btnLogout.setOnClickListener(v-> logout());
         if(selectedBtnId == 0){
@@ -118,11 +137,9 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
         else{
             setButtonGreyer(findViewById(selectedBtnId));
         }
-
     }
 
     private void logout() {
-        //TODO: use logout service
         navigateToMainActivity();
         API.api().usersService.logout().exceptionally(e -> {
                 Log.e("Logout"," Log out error: " + e.getMessage());
@@ -141,16 +158,7 @@ public class ToolbarComponent extends LinearLayout implements IComponent {
             this.flFragmentContainer = flFragmentContainer;
         }
 
-        try{
-            Fragment fragment = currentFragmentClass.getDeclaredConstructor().newInstance();
-            fragmentManager.beginTransaction()
-                    .replace(flFragmentContainer.getId(), fragment)
-                    .addToBackStack(null) // Optional: Adds the transaction to the back stack
-                    .commit();
-        }
-        catch (Exception e){
-            Log.i("Toolbar","Unable to start fragment");
-        }
+        replaceFragment();
     }
 
 }

@@ -13,6 +13,7 @@ import com.example.calendarapp.API.TokenManagement.TokenManager;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import okhttp3.OkHttpClient;
@@ -137,14 +138,17 @@ public class UsersService {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.i("UsersService", "Request getUserById was successful");
                     future.complete(response.body());
                 } else {
+                    Log.e("UsersService", "Request getUserById returned empty response");
                     future.completeExceptionally(new Exception(parseError(response)));
                 }
             }
 
             @Override
             public void onFailure(Call<UserResponse> call, Throwable t) {
+                Log.e("UsersService", "Request getUserById failed with id " + userId + ": \n"+ t.getMessage());
                 future.completeExceptionally(t);
             }
         });

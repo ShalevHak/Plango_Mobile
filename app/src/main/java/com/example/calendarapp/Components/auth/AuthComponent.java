@@ -3,11 +3,14 @@ package com.example.calendarapp.Components.auth;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -27,6 +30,7 @@ public class AuthComponent extends LinearLayout implements IComponent {
     private Button btnAuth;
     private GoogleAuthComponent googleAutoComponent;
     private EditText etName, etEmail, etPassword, etConfirmPassword;
+    private CheckBox cbShowPassword;
     private API api;
     public AuthComponent(Context context) {
         super(context);
@@ -65,14 +69,13 @@ public class AuthComponent extends LinearLayout implements IComponent {
     private void initSignInViews(View view) {
         etEmail = view.findViewById(R.id.etSignInEmail);
         etPassword = view.findViewById(R.id.etSignInPassword);
+        etConfirmPassword = new EditText(getContext()); // To ensure not null
         btnAuth = view.findViewById(R.id.btnSignIn);
         googleAutoComponent = view.findViewById(R.id.GoogleAutoSignIn);
         toggleAutoLink = view.findViewById(R.id.flLinkToSignUp);
+        cbShowPassword = view.findViewById(R.id.cbShowPassword);
         initListeners();
     }
-
-
-
     private void initSignUpViews(View view) {
         etName = view.findViewById(R.id.etName);
         etEmail = view.findViewById(R.id.etSignUpEmail);
@@ -81,12 +84,25 @@ public class AuthComponent extends LinearLayout implements IComponent {
         btnAuth = view.findViewById(R.id.btnSignUp);
         googleAutoComponent = view.findViewById(R.id.GoogleAutoSignUp);
         toggleAutoLink = view.findViewById(R.id.flLinkToSignIn);
+        cbShowPassword = view.findViewById(R.id.cbShowPasswords);
         initListeners();
     }
 
     private void initListeners() {
         toggleAutoLink.setOnClickListener(v -> openLink());
         btnAuth.setOnClickListener(v -> handleAuth());
+        cbShowPassword.setOnCheckedChangeListener((buttonView, isChecked) -> showPassword(isChecked));
+    }
+
+    private void showPassword(boolean isChecked) {
+        etPassword.setTransformationMethod(
+                !isChecked
+                    ? new PasswordTransformationMethod()
+                    : null);
+        etConfirmPassword.setTransformationMethod(
+                !isChecked
+                    ? new PasswordTransformationMethod()
+                    : null);
     }
 
     private void handleAuth() {
@@ -111,10 +127,6 @@ public class AuthComponent extends LinearLayout implements IComponent {
     }
 
     private void handleSignIn() {
-
-
-
-
         String email = etEmail.getText().toString();
         String password = etPassword.getText().toString();
         setClickableButtons(false);
