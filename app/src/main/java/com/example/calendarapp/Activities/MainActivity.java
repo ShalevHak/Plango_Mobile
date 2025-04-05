@@ -35,23 +35,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void initActivity() { // Initialize globally
         API.init(this);
+        TokenManager.init(this);
+
         NetworkUtil.registerNetworkCallback(this);
 
         // Check if user is logged in (JWT exists)
-        if (isLoggedIn()) {
-            startActivity(new Intent(this, ContentActivity.class));
-            finish(); // Close MainActivity so user can't go back to it
-        }
-        else {
-            API.api().usersService.logout();
-        }
+        checkLoggedIn();
     }
 
-    private boolean isLoggedIn() {
-        // TODO: fix - validate token and userID
-        String token = TokenManager.getInstance().getToken();
-        String userID = TokenManager.getInstance().getUserID();
-
-        return userID != null && userID.isEmpty() && token != null && !token.isEmpty(); // User is logged in if token exists
+    private void checkLoggedIn() {
+        API.api().usersService.getMe().thenAccept(userResponse -> {
+            // If getMe request succeed, user is logged in
+            if(userResponse.status.equals("success")){
+                startActivity(new Intent(this, ContentActivity.class));
+                finish(); // Close MainActivity so user can't go back to it
+            }
+            else{
+                API.api().usersService.logout();
+            }
+        }).exceptionally(e ->{
+            // If request fails, user is not logged in
+            API.api().usersService.logout();
+            return null;
+        });
     }
 }

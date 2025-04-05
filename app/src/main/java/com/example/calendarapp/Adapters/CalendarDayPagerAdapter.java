@@ -1,38 +1,31 @@
 package com.example.calendarapp.Adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Calendars.DayComponent;
-import com.example.calendarapp.R;
-import com.example.calendarapp.Services.CalendarService;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import com.example.calendarapp.Managers.CalendarsManager;
 
 
 public class CalendarDayPagerAdapter extends RecyclerView.Adapter<CalendarDayPagerAdapter.ViewHolder>{
-    private CalendarService calendarService;
-    public CalendarDayPagerAdapter() {
-        calendarService = CalendarService.getInstance();
+    private CalendarsManager calendarsManager;
+    private Context parentContext;
+    private String calendarId;
+    public CalendarDayPagerAdapter(String calendarId) {
+
+        calendarsManager = CalendarsManager.getInstance();
+        this.calendarId = calendarId;
     }
     @NonNull
     @Override
     public CalendarDayPagerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        DayComponent dayComponent = new DayComponent(parent.getContext());
+        parentContext = parent.getContext();
+        DayComponent dayComponent = new DayComponent(parentContext, calendarId);
 
         // Set layout parameters to MATCH_PARENT
         dayComponent.setLayoutParams(new ViewGroup.LayoutParams(
@@ -46,8 +39,8 @@ public class CalendarDayPagerAdapter extends RecyclerView.Adapter<CalendarDayPag
 
     @Override
     public void onBindViewHolder(@NonNull CalendarDayPagerAdapter.ViewHolder holder, int position) {
-        List<Event> events = calendarService.GetCurrentDayEvent();
-        holder.bind(position, events);
+        holder.bind(position);
+
     }
 
     @Override
@@ -55,18 +48,18 @@ public class CalendarDayPagerAdapter extends RecyclerView.Adapter<CalendarDayPag
         return 3;
     }
 
-    protected static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private static int count;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
         }
 
-        public void bind(int position, List<Event> events ) {
+        public void bind(int position) {
             ((DayComponent) itemView).clearEvents();
             if(position!= 1)return;
-            Log.i("ADAPTER","binding view");
+            Log.i("CalendarDayPagerAdapter","binding view");
             ((DayComponent) itemView).resetScroller();
-            ((DayComponent) itemView).addEvents(events);
+            ((DayComponent) itemView).displayEvents();
         }
     }
 }

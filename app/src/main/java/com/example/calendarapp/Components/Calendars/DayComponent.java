@@ -5,7 +5,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
-import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -18,7 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
-import com.example.calendarapp.Services.CalendarService;
+import com.example.calendarapp.Managers.CalendarsManager;
 import com.example.calendarapp.Utils.ThemeUtils;
 import com.example.calendarapp.Utils.TimeUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -42,12 +41,14 @@ public class DayComponent extends LinearLayout implements IComponent {
     private ConstraintLayout eventContainer;
     private ScrollView svDay;
     private HorizontalScrollView hsvFullDayEvents;
-    private CalendarService calendarService;
+    private CalendarsManager calendarsManager;
     private FloatingActionButton fabAddEvent;
+    private String calendarId;
 
-    public DayComponent(Context context) {
+    public DayComponent(Context context, String calendarId) {
         super(context);
         initComponent(context);
+        this.calendarId = calendarId;
     }
 
     public DayComponent(Context context, @Nullable AttributeSet attrs) {
@@ -68,7 +69,7 @@ public class DayComponent extends LinearLayout implements IComponent {
     public void initComponent(Context context) {
         inflate(context, R.layout.day_component, this);
 
-        calendarService = CalendarService.getInstance();
+        calendarsManager = CalendarsManager.getInstance();
 
         hourBackground         = findViewById(R.id.llHourBackground);
         eventContainer         = findViewById(R.id.clEventContainer);
@@ -80,7 +81,7 @@ public class DayComponent extends LinearLayout implements IComponent {
         // Click Listener for Adding Events
         fabAddEvent.setOnClickListener(view -> {
             // Get the current date from the calendar service
-            Date now = calendarService.GetCurrentDay();
+            Date now = calendarsManager.GetCurrentDay();
             Calendar startCalendar = Calendar.getInstance();
             startCalendar.setTime(now);
 
@@ -366,18 +367,43 @@ public class DayComponent extends LinearLayout implements IComponent {
         svDay.scrollTo(0, 0);
     }
     private void addNewEvent(Event event) {
-        calendarService.addEvent(event);
-        clearEvents();
-        addEvents(calendarService.GetCurrentDayEvent());
+        calendarsManager.addEvent(event, calendarId)
+                .thenAccept(e ->{
+                    clearEvents();
+                    displayEvents();
+                })
+                .exceptionally(
+                e -> {
+                    String msg = "Unable to add event: \n" + e.getMessage();
+                    Log.e("DayComponent",msg);
+                    Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
+                    return null;
+                });
     }
 
     public void editEvent(Event originalEvent, Event editedEvent) {
-        calendarService.updateEvent(originalEvent, editedEvent);
-        clearEvents();
-        addEvents(calendarService.GetCurrentDayEvent());
+        calendarsManager.updateEvent(originalEvent, editedEvent, calendarId)
+                .thenAccept(e ->{
+                    clearEvents();
+                    displayEvents();
+                })
+                .exceptionally(
+                e -> {
+                    String msg = "Unable to update event: \n" + e.getMessage();
+                    Log.e("DayComponent",msg);
+                    Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
+                    return null;
+                });
     }
 
-
+    public void displayEvents(){
+        calendarsManager.GetCurrentDayEvent().thenAccept(this::addEvents).exceptionally(e -> {
+            String msg = "Unable to load events: \n" + e.getMessage();
+            Log.e("DayComponent",msg);
+            Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
+            return null;
+        });
+    }
     static class UIDayEvent{
         public float widthWeight;
         public float heightWeight;

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
@@ -11,25 +12,24 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.calendarapp.Adapters.CalendarDayPagerAdapter;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
-import com.example.calendarapp.Services.CalendarService;
+import com.example.calendarapp.Managers.CalendarsManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
-    public class DayCalendar2 extends LinearLayout implements IComponent {
-
+public class DayCalendar2 extends LinearLayout implements IComponent {
+    private  String calendarId = null;
     private TextView tvDayOfMonth, tvMonth, tvYear;
     private ViewPager2 viewPager;
-    private CalendarService calendarService;
+    private CalendarsManager calendarsManager;
     private int pagerPos;
 
     private CalendarDayPagerAdapter adapter;
-    public DayCalendar2(Context context) {
+    public DayCalendar2(Context context, String calendarId) {
         super(context);
         initComponent(context);
+        this.calendarId = calendarId;
     }
 
     public DayCalendar2(Context context, @Nullable AttributeSet attrs) {
@@ -50,7 +50,7 @@ import java.util.Locale;
     @Override
     public void initComponent(Context context) {
         //Get an instance of CalendarService
-        calendarService = CalendarService.getInstance();
+        calendarsManager = CalendarsManager.getInstance();
 
         LinearLayout dayCalendar = (LinearLayout) inflate(context,R.layout.day_calendar_container,this);
         // Initialize TabLayout and ViewPager2
@@ -58,40 +58,17 @@ import java.util.Locale;
         tvMonth = dayCalendar.findViewById(R.id.tvMonth);
         tvYear = dayCalendar.findViewById(R.id.tvYear);
         viewPager = dayCalendar.findViewById(R.id.vpDays);
+
         pagerPos = 0;
-        adapter = new CalendarDayPagerAdapter();
-        viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(1);
 
-        UpdateDateTitle();
+        if (calendarId == null) {
+            calendarsManager.getMyScheduleId().thenAccept(this::initViewPager).exceptionally(e ->{
+                Toast.makeText(context, "Could not find user's schedule", Toast.LENGTH_SHORT).show();
+                return null;
+            });
+        }
 
-
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            boolean suppressCallback = false; // Flag to suppress unnecessary callback triggers
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-                if (state == ViewPager2.SCROLL_STATE_IDLE && !suppressCallback) {
-                    // Adjust the calendar and reset to the middle page
-
-                    // Update calendar based on Swiped direction
-                    updateCalendar(pagerPos);
-
-                    // Update the title
-                    UpdateDateTitle();
-
-                    // Reset to page 1 without animation and without unwanted recursive call to onPageScrollStateChanged
-                    suppressCallback = true;
-                    viewPager.setCurrentItem(1, false);
-                    viewPager.getAdapter().notifyDataSetChanged();
-                    suppressCallback= false;
-                }
-            }
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                pagerPos = position; // Track the current page
-            }
-        });
+        initViewPager(calendarId);
         // Link TabLayout with ViewPager2
 //        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
 //            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd");
@@ -99,18 +76,59 @@ import java.util.Locale;
 //        }).attach();
     }
 
+    private void initViewPager(String _calendarId) {
+        adapter = new CalendarDayPagerAdapter(_calendarId);
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(1);
+        updateDateTitle();
+        setViewPagerListener();
+    }
+
+    private void setViewPagerListener() {
+            viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                boolean ignoreNextStateChange = true; // Flag to suppress unnecessary callback triggers
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                    if (state == ViewPager2.SCROLL_STATE_IDLE && !ignoreNextStateChange) {
+                        // Adjust the calendar and reset to the middle page
+
+                        // Update calendar based on Swiped direction
+                        updateCalendar(pagerPos);
+
+                        // Update the title
+                        updateDateTitle();
+
+                        // Reset to page 1 without animation and without unwanted recursive call to onPageScrollStateChanged
+                        resetToMiddlePage();
+                    }
+                    if(ignoreNextStateChange) ignoreNextStateChange = false;
+                }
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    pagerPos = position; // Track the current page
+                }
+                private void resetToMiddlePage() {
+                    ignoreNextStateChange = true;
+                    viewPager.setCurrentItem(1, false);
+                    viewPager.getAdapter().notifyDataSetChanged();
+                }
+
+            });
+        }
+
         private void updateCalendar(int pagerPos) {
             if (pagerPos == 0) { // Swiped to "previous day"
-                calendarService.add(Calendar.DAY_OF_MONTH, -1);
+                calendarsManager.add(Calendar.DAY_OF_MONTH, -1);
             } else if (pagerPos == 2) { // Swiped to "next day"
-                calendarService.add(Calendar.DAY_OF_MONTH, 1);
+                calendarsManager.add(Calendar.DAY_OF_MONTH, 1);
             }
         }
 
-        private void UpdateDateTitle() {
-        String monthName = new SimpleDateFormat("MMMM", Locale.ENGLISH).format(calendarService.getCurrentCalendar().getTime());
+        private void updateDateTitle() {
+        String monthName = new SimpleDateFormat("MMMM", Locale.ENGLISH).format(calendarsManager.getCurrentCalendar().getTime());
         tvMonth.setText(monthName);
-        tvYear.setText(calendarService.getCurrentCalendar().get(Calendar.YEAR)+"");
-        tvDayOfMonth.setText(calendarService.getCurrentCalendar().get(Calendar.DAY_OF_MONTH)+"");
+        tvYear.setText(calendarsManager.getCurrentCalendar().get(Calendar.YEAR)+"");
+        tvDayOfMonth.setText(calendarsManager.getCurrentCalendar().get(Calendar.DAY_OF_MONTH)+"");
     }
 }
