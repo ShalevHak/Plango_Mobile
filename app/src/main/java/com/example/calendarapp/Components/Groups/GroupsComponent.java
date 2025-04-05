@@ -1,4 +1,4 @@
-package com.example.calendarapp.Components;
+package com.example.calendarapp.Components.Groups;
 
 import android.content.Context;
 import android.util.AttributeSet;
