@@ -66,7 +66,7 @@ public class UserInfoComponent extends LinearLayout implements IComponent {
 
         // Add user display name (optional)
         TextView displayNameText = new TextView(context);
-        displayNameText.setText("Name: " + user.name); // Assuming `user` has a `name` field
+        displayNameText.setText("Name: " + user.getName()); // Assuming `user` has a `name` field
         displayNameText.setTextSize(14);
         displayNameText.setTextColor(Color.GRAY);
         displayNameText.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -74,7 +74,7 @@ public class UserInfoComponent extends LinearLayout implements IComponent {
 
         // Add user email
         TextView emailText = new TextView(context);
-        emailText.setText("Email: " + user.email);
+        emailText.setText("Email: " + user.getEmail());
         emailText.setTextSize(16);
         emailText.setTextColor(Color.BLACK);
         emailText.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));

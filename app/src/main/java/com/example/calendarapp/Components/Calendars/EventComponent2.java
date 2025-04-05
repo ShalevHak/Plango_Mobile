@@ -83,7 +83,8 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
 
         Drawable backgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corner_background);
         if (backgroundDrawable != null) {
-            int color = event.getColor() != 0 ? ThemeUtils.resolveColorFromTheme(getContext(),event.getColor()) : Color.parseColor("#FF9800");
+            int colorId = ThemeUtils.getColorIDFromName(event.getColor());
+            int color = ThemeUtils.resolveColorFromTheme(getContext(),colorId);
             backgroundDrawable.setTint(color);
             this.setBackground(backgroundDrawable);
         }
@@ -111,7 +112,8 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         // Load the rounded corner background
         Drawable backgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corner_background);
         if (backgroundDrawable != null) {
-            int color = event.getColor() != 0 ? ThemeUtils.resolveColorFromTheme(getContext(),event.getColor()) : Color.parseColor("red");
+            int colorId = ThemeUtils.getColorIDFromName(event.getColor());
+            int color = ThemeUtils.resolveColorFromTheme(getContext(),colorId);
             // Apply a red tint to the background drawable
             backgroundDrawable.setTint(color);
             this.setBackground(backgroundDrawable); // Set the tinted drawable as the background

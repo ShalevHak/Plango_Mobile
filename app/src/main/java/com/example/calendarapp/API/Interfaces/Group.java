@@ -5,15 +5,95 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.lang.reflect.Member;
+import java.util.HashMap;
+
 public class Group {
     // Example properties
+
+    @SerializedName("name")
     private String name;
+    @SerializedName("color")
+    private String color;
+    @SerializedName("about")
+    private String about;
+    @SerializedName("visibility")
+    private String visibility;
+
+    // Map Emails to Roles
+    @SerializedName("members")
+    private HashMap<String,String> members;
+
     private Bitmap profilePicture; // Stores the Bitmap directly
 
-    // Constructor
+    // TODO: move to correct interfaces: IIdentifiers, IProfileCard, IMembers, IVisibility
+    public static final String[] visibilityOptions = {"Private", "Public", "Protected"};
+    public static final String[] Roles = {"owner","admin","member"};
+
+
+    // Constructors
     public Group(String name) {
         this.name = name;
         this.profilePicture = generateDefaultProfilePicture(name);
+    }
+
+    public Group(String name, String about, String color, String visibility) {
+        this.name = name;
+        this.about = about;
+        this.color = color;
+        this.visibility = visibility;
+        this.profilePicture = generateDefaultProfilePicture(name);
+    }
+
+    public Group(String name, String about, String color, String visibility, HashMap<String,String> members)  {
+        this.name = name;
+        this.about = about;
+        this.color = color;
+        this.visibility = visibility;
+        this.profilePicture = generateDefaultProfilePicture(name);
+        this.members = members;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
+    }
+
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
+    public HashMap<String, String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(HashMap<String, String> members) {
+        this.members = members;
+    }
+
+    public void setProfilePicture(Bitmap profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public String getName() {

@@ -1,32 +1,48 @@
 package com.example.calendarapp.API.Interfaces;
 
+import com.google.gson.annotations.SerializedName;
 import com.example.calendarapp.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.function.Function;
 
 public class Event {
+    @SerializedName("_id")
+    private String id;
+    @SerializedName("name")
     private String title;
+
+    @SerializedName("about")
     private String description;
+
+    @SerializedName("start")
     private Date startDate;
+
+    @SerializedName("end")
     private Date endDate;
+
+    @SerializedName("fullDay")
     private Boolean fullDay;
-    private int color;
-    public static int DEFAULT_COLOR = R.attr.eventColor1; // Purple
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
+    @SerializedName("color")
+    private String color;
 
+    public static final String DEFAULT_COLOR = "#3070a3";
 
+    private static final SimpleDateFormat dateFormat =
+            new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
+
+    // Constructors
     public Event(String title, Date startDate, Date endDate) {
         validateDates(startDate, endDate);
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.fullDay = calcIsFullDay(startDate,endDate);
+        this.fullDay = calcIsFullDay(startDate, endDate);
         this.color = DEFAULT_COLOR;
     }
+
     public Event(String title, String description, Date startDate, Date endDate) {
         validateDates(startDate, endDate);
         this.title = title;
@@ -37,23 +53,13 @@ public class Event {
         this.color = DEFAULT_COLOR;
     }
 
-    public Event(String title, String description, Date startDate, Date endDate, int color) {
+    public Event(String title, String description, Date startDate, Date endDate, String color) {
         validateDates(startDate, endDate);
         this.title = title;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.fullDay = calcIsFullDay(startDate, endDate);
-        this.color = color;
-    }
-
-    public Event(String title, String description, Date startDate, Date endDate, boolean fullDay, int color) {
-        validateDates(startDate, endDate);
-        this.title = title;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.fullDay = fullDay;
         this.color = color;
     }
 
@@ -66,50 +72,61 @@ public class Event {
         this.fullDay = fullDay;
         this.color = DEFAULT_COLOR;
     }
-    public Event(String title, Date startDate, Date endDate, boolean fullDay) {
-        validateDates(startDate, endDate);
-        this.title = title;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.fullDay = fullDay;
-        this.color = DEFAULT_COLOR;
-    }
+
+    // Validation and logic
     private void validateDates(Date startDate, Date endDate) {
         if (startDate.after(endDate)) {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
     }
+
     private Boolean calcIsFullDay(Date startDate, Date endDate) {
-        // Calculate the duration in milliseconds
-        float duration = this.getDurationHours();
-        return duration >= 24;
+        return getDurationHours() >= 24;
     }
-    // Returns event duration in hours
+
+    // Utility methods
     public float getDurationHours() {
         long durationMillis = endDate.getTime() - startDate.getTime();
-        long millisInHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
         return durationMillis / (1000f * 60 * 60);
     }
+
     public float getDurationMS() {
         return endDate.getTime() - startDate.getTime();
     }
-    // Returns event start hour (0-23)
+
     public int getStartHour() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(startDate);
         return cal.get(Calendar.HOUR_OF_DAY);
     }
-    // Returns formatted start date
+
     public String getFormattedStartDate() {
         return dateFormat.format(startDate);
     }
 
-    // Returns formatted end date
     public String getFormattedEndDate() {
         return dateFormat.format(endDate);
     }
+
+    public boolean overlaps(Event other) {
+        return !(this.endDate.before(other.startDate) || this.startDate.after(other.endDate));
+    }
+
+    public boolean startBefore(Event other) {
+        return this.startDate.before(other.startDate);
+    }
+
+    public boolean endBefore(Event other) {
+        return this.endDate.before(other.endDate);
+    }
+
+    // Getters and Setters
     public String getTitle() {
         return title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Date getStartDate() {
@@ -123,9 +140,11 @@ public class Event {
     public Boolean isFullDay() {
         return fullDay;
     }
-    public int getColor() {
+
+    public String getColor() {
         return color;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -134,7 +153,7 @@ public class Event {
         this.description = description;
     }
 
-    public void setColor(int color) {
+    public void setColor(String color) {
         this.color = color;
     }
 
@@ -142,20 +161,7 @@ public class Event {
     public String toString() {
         return title + " (" + getFormattedStartDate() + " - " + getFormattedEndDate() + ")";
     }
-    // Checks if two events overlap
-    public boolean overlaps(Event other) {
-        return !(this.endDate.before(other.startDate) || this.startDate.after(other.endDate));
-    }
-
-    public boolean startBefore(Event other){
-        return this.startDate.before(other.startDate);
-    }
-    public boolean endBefore(Event other){
-        return this.endDate.before(other.endDate);
-    }
-
-
-    public String getDescription() {
-        return description;
+    public String getId(){
+        return id;
     }
 }

@@ -39,16 +39,11 @@ public class EventEditComponent extends LinearLayout implements IComponent {
     private Spinner spinnerEventColor;
     private View viewColorPreview;
     private int selectedColorAttr;
-    // Predefined color values
-    private static final int[] eventColors = new int[] {
-                    R.attr.eventColor1,
-                    R.attr.eventColor2,
-                    R.attr.eventColor3,
-                    R.attr.eventColor4,
-                    R.attr.eventColor5,
-                    R.attr.eventColor6,
-            };
+    private String selectedColorName;
 
+    // Predefined color names and IDs
+    private static final int[] eventColors = ThemeUtils.eventColorsID;
+    private static final String[] colorNames = ThemeUtils.eventColorsNames;
 
     public EventEditComponent(Context context) {
         super(context);
@@ -184,7 +179,7 @@ public class EventEditComponent extends LinearLayout implements IComponent {
 
 
             // Create event object
-            Event event = new Event(title, description, startCalendar.getTime(), endCalendar.getTime(), selectedColorAttr);
+            Event event = new Event(title, description, startCalendar.getTime(), endCalendar.getTime(), selectedColorName);
 
             // Ensure event's duration is at least 5 minutes
             if(event.getDurationMS()<=5*1000*60){
@@ -224,16 +219,16 @@ public class EventEditComponent extends LinearLayout implements IComponent {
             etEndTime.setText(timeFormat.format(event.getEndDate()));
         }
 
-        if (event.getColor() != 0) {
+        if (event.getColor() != null) {
             int colorIndex = 0;
             for (int i = 0; i < eventColors.length; i++) {
-                if (eventColors[i] == event.getColor()) {
+                if (colorNames[i].equals(event.getColor())) {
                     colorIndex = i;
                     break;
                 }
             }
             spinnerEventColor.setSelection(colorIndex);
-            viewColorPreview.setBackgroundColor(event.getColor());
+           // viewColorPreview.setBackgroundColor(event.getColor());
         }
     }
     // Static method to show the event edit dialog
@@ -279,9 +274,10 @@ public class EventEditComponent extends LinearLayout implements IComponent {
 
 
         selectedColorAttr = eventColors[0];
+        selectedColorName = colorNames[0];
 
         // Create a dropdown list with color names
-        String[] colorNames = {"Purple", "Pink", "Orange", "Red", "Green", "Blue"};
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, colorNames);
         spinnerEventColor.setAdapter(adapter);
 
@@ -289,12 +285,13 @@ public class EventEditComponent extends LinearLayout implements IComponent {
         spinnerEventColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedColorAttr = eventColors[position];
+                selectedColorName = colorNames[position];
+                selectedColorAttr = ThemeUtils.getColorIDFromName(selectedColorName);
                 viewColorPreview.setBackgroundColor(ThemeUtils.resolveColorFromTheme(context,selectedColorAttr));
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {spinnerEventColor.setSelection(0);}
         });
 
     }
