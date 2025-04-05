@@ -16,6 +16,7 @@ import com.example.calendarapp.API.Interfaces.Group;
 import com.example.calendarapp.Activities.GroupActivity;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
+import com.example.calendarapp.Utils.ThemeUtils;
 
 public class GroupItemComponent extends LinearLayout implements IComponent, View.OnClickListener {
     private Group group;
@@ -47,25 +48,40 @@ public class GroupItemComponent extends LinearLayout implements IComponent, View
 
     @Override
     public void initComponent(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.group_component, this, true);
+        LayoutInflater.from(context).inflate(R.layout.group_item_component, this, true);
         ImageView groupIcon = findViewById(R.id.ivGroupIcon);
         TextView groupName = findViewById(R.id.tvGroupName);
+        View colorStripe = findViewById(R.id.viewColorStripe);
+
         this.setClickable(true);
         this.setOnClickListener(this);
 
-        if(group==null){
-            this.group = new Group("");
+        if (group == null) {
+            this.group = new Group(""); // fallback
         }
-        Bitmap groupBitmap = group.getProfilePicture(); // Assuming Group has getProfilePicture()
+
+        Bitmap groupBitmap = group.getProfilePicture();
         if (groupBitmap != null) {
             groupIcon.setImageBitmap(groupBitmap);
         } else {
-            groupIcon.setImageResource(R.drawable.user_icon); // Fallback icon
+            groupIcon.setImageResource(R.drawable.user_icon);
         }
 
-        // Set the name of the group
         groupName.setText(group.getName());
+
+
+        groupName.setTextColor(ThemeUtils.resolveColorFromTheme(getContext(),R.attr.colorPrimaryText));
+
+        // 🎨 Apply group color
+        if (group.getColor() != null && !group.getColor().isEmpty()) {
+            int colorId = ThemeUtils.getColorIDFromName(group.getColor());
+            int color = ThemeUtils.resolveColorFromTheme(getContext(), colorId);
+            colorStripe.setBackgroundColor(color);
+        } else {
+            colorStripe.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+        }
     }
+
 
     @Override
     public void onClick(View v) {
