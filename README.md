@@ -6,6 +6,8 @@
 
 Plango is actively being developed. Currently, the app is in early stages of development, and while it is functional for basic scheduling needs, As a solo developer, I'm continuously enhancing and expanding its functionality to deliver a robust and advanced scheduling solution for businesses and service providers.
 
+![Plango Logo](assets/logo_v2.png)
+
 ## Features (Planned for Final Release) 🚀
 
 ### 🗓️ **Advanced Scheduling**
