@@ -1,4 +1,4 @@
-package com.example.calendarapp.Fragments;
+package com.example.calendarapp.Fragments.Content;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

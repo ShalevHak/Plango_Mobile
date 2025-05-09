@@ -11,8 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.calendarapp.Components.ToolbarComponent;
-import com.example.calendarapp.Fragments.UserFragment;
+import com.example.calendarapp.Components.Toolbars.ToolbarComponent;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.NetworkUtil;
 

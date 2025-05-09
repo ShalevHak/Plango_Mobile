@@ -1,4 +1,4 @@
-package com.example.calendarapp.Fragments;
+package com.example.calendarapp.Fragments.Content;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,7 +12,7 @@ import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.Components.UserInfoComponent;
 import com.example.calendarapp.R;
 
-public class UserFragment extends Fragment implements IComponent {
+public class UserInfoFragment extends Fragment implements IComponent {
     private View layout;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -16,12 +16,12 @@
         android:layout_weight="1"
         android:gravity="center"/>
 
-    <com.example.calendarapp.Components.ToolbarComponent
+    <com.example.calendarapp.Components.Toolbars.ToolbarComponent
         android:id="@+id/tbMain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="end"
         android:layout_marginHorizontal="8dp">
 
-    </com.example.calendarapp.Components.ToolbarComponent>
+    </com.example.calendarapp.Components.Toolbars.ToolbarComponent>
 </LinearLayout>
