@@ -1,5 +1,6 @@
 package com.example.calendarapp.API.Responses;
 
+import com.example.calendarapp.API.Interfaces.User;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
@@ -20,7 +21,7 @@ public class AuthResponse {
     @SerializedName("stack")
     public String stack;
     @SerializedName("user")
-    public JsonObject user;
+    public User user;
 
     @Override
     public String toString() {
@@ -30,7 +31,7 @@ public class AuthResponse {
                 ", token='" + token + '\'' +
                 ", error='" + error + '\'' +
                 ", stack='" + stack + '\'' +
-                ", userID'" + user.get("id").toString() + '\'' +
+                ", userID'" + user.getId() + '\'' +
                 '}';
     }
 }

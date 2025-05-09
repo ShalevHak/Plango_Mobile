@@ -45,7 +45,7 @@ public class UsersService extends AbstractAPIService<UsersHelper> {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse data = response.body();
                     String token = data.token;
-                    String userID = data.user.get("id").toString();
+                    String userID = data.user.getId();
                     tokenManager.saveToken(token);
                     tokenManager.saveUserID(userID);
                     future.complete(data);
@@ -73,7 +73,7 @@ public class UsersService extends AbstractAPIService<UsersHelper> {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse data = response.body();
                     String token = data.token;
-                    String userID = data.user.get("id").toString();
+                    String userID = data.user.getId();
                     tokenManager.saveToken(token);
                     tokenManager.saveUserID(userID);
                     future.complete(data);
