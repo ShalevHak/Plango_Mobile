@@ -34,11 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initActivity() { // Initialize globally
-        API.init(this);
-        TokenManager.init(this);
-
         NetworkUtil.registerNetworkCallback(this);
-
         // Check if user is logged in (JWT exists)
         checkLoggedIn();
     }

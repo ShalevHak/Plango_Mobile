@@ -4,32 +4,34 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+// Singleton class for managing token-related SharedPreferences operations
+// Initialized once via App context to prevent memory leaks and ensure global access
 public class TokenManager {
     private static TokenManager instance;
-    private static SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
     private static final String PREF_NAME = "app_prefs";
     private static final String KEY_JWT = "jwt_token";
     private static final String KEY_USERID = "user_id";
 
-    private static String _token;
-    private static String _userID;
+    private String _token;
+    private String _userID;
 
-    private TokenManager() {
+    private TokenManager(Context context) {
+        if (sharedPreferences == null) {
+            sharedPreferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        }
         // Private constructor to prevent direct instantiation
     }
 
     public static void init(Context context) {
-        if (sharedPreferences == null) {
-            sharedPreferences = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        }
         if (instance == null) {
-            instance = new TokenManager();
+            instance = new TokenManager(context);
         }
     }
 
     public static TokenManager getInstance() {
         if (instance == null) {
-            instance = new TokenManager();
+            throw new IllegalStateException("TokenManager is not initialized. Call init(context) first.");
         }
         return instance;
     }
@@ -62,7 +64,7 @@ public class TokenManager {
             Log.e("TokenManager", "sharedPreferences is null");
             return;
         }
-        token = token;
+        _token = token;
         sharedPreferences.edit().putString(KEY_JWT, token).apply();
         Log.i("TokenManager", "New token saved");
     }
