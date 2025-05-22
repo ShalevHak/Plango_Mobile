@@ -1,10 +1,13 @@
 package com.example.calendarapp.Managers;
 
+import android.os.strictmode.Violation;
 import android.util.Log;
 
 import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.Interfaces.Group;
 import com.example.calendarapp.API.Responses.GetGroupsResponse;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -56,12 +59,12 @@ public class GroupsManager {
         return future;
     }
 
-    public CompletableFuture<Void> updateGroup(String originalGroupId, Group newGroup) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-
+    public CompletableFuture<Group> updateGroup(String originalGroupId, Group newGroup) {
+        CompletableFuture<Group> future = new CompletableFuture<>();
+        Log.i("GroupsManager","Updating Group: " + newGroup);
         API.api().groupsService.updateGroup(originalGroupId, newGroup)
-                .thenAccept(result -> {
-                    future.complete(null);  // success
+                .thenAccept(res -> {
+                    future.complete(res.data);  // success
                 })
                 .exceptionally(e-> {
                     future.completeExceptionally(e);  // fail
@@ -72,4 +75,39 @@ public class GroupsManager {
     }
 
 
+    public CompletableFuture<Group> getGroupById(String groupId) {
+        CompletableFuture<Group> future = new CompletableFuture<>();
+        API.api().groupsService.getGroupById(groupId)
+                .thenAccept(groupHandlerResponse -> {
+                    if(!groupHandlerResponse.status.equals("success")||groupHandlerResponse.data == null) future.completeExceptionally(new Exception("Fetched a null group"));
+                    Log.i("GroupsManager","Successfully fetched group: " + groupId);
+                    future.complete(groupHandlerResponse.data);
+                })
+                .exceptionally(
+                        e -> {
+                            future.completeExceptionally(e);
+                            return null;
+                        }
+                );
+
+        return future;
+    }
+
+    public CompletableFuture<Void> leaveGroup(Group group) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        API.api().usersService.getMe().thenAccept(userResponse -> {
+            group.removeMember(userResponse.user.getEmail());
+            Group updatedGroup = new Group(group);
+            updateGroup(group.getId(),updatedGroup).thenAccept(res -> future.complete(null))
+                    .exceptionally(e -> {
+                       future.completeExceptionally(e);
+                       return null;
+                    });
+        }).exceptionally(e -> {
+            future.completeExceptionally(e);
+            return null;
+        });
+        return future;
+    }
 }

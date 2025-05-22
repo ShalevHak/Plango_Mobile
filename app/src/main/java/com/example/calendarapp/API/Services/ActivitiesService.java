@@ -154,7 +154,7 @@ public class ActivitiesService extends AbstractAPIService<ActivitiesHelper>{
             public void onResponse(Call<EventHandlerResponse> call, Response<EventHandlerResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     EventHandlerResponse data = response.body();
-                    Event fetchedEvent = data.data.doc;
+                    Event fetchedEvent = data.data;
                     future.complete(fetchedEvent);
                 } else {
                     future.completeExceptionally(new Exception(parseError(response)));
@@ -178,7 +178,7 @@ public class ActivitiesService extends AbstractAPIService<ActivitiesHelper>{
             public void onResponse(Call<EventHandlerResponse> call, Response<EventHandlerResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     EventHandlerResponse data = response.body();
-                    Event fetchedEvent = data.data.doc;
+                    Event fetchedEvent = data.data;
                     future.complete(fetchedEvent);
                 } else {
                     future.completeExceptionally(new Exception(parseError(response)));

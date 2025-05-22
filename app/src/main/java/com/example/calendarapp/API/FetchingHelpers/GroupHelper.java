@@ -3,9 +3,11 @@ package com.example.calendarapp.API.FetchingHelpers;
 import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.API.Interfaces.Group;
 import com.example.calendarapp.API.Responses.DefaultResponse;
+import com.example.calendarapp.API.Responses.HandlerResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -21,5 +23,7 @@ public interface GroupHelper {
     );
 
     @PATCH("{groupId}")
-    Call<DefaultResponse> updateGroup(@Path("originalGroupId") String originalGroupId, Group newGroup);
+    Call<HandlerResponse<Group>> updateGroup(@Path("groupId") String originalGroupId, @Body Group group);
+    @GET("{groupId}")
+    Call<HandlerResponse<Group>> getGroupById(@Path("groupId") String groupId);
 }

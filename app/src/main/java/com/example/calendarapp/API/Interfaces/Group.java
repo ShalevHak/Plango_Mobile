@@ -4,14 +4,19 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.lang.reflect.Member;
 import java.util.HashMap;
 
-public class Group {
-    // Example properties
+public class Group implements Parcelable {
+    @SerializedName("_id")
+    private String id;
 
     @SerializedName("name")
     private String name;
@@ -54,6 +59,15 @@ public class Group {
         this.visibility = visibility;
         this.profilePicture = generateDefaultProfilePicture(name);
         this.members = members;
+    }
+
+    public Group(Group group) {
+        this.name = group.getName();
+        this.about = group.getAbout();
+        this.color = group.getColor();
+        this.visibility = group.getVisibility();
+        this.profilePicture =  group.getProfilePicture();
+        this.members = group.getMembers();
     }
 
     public void setName(String name) {
@@ -137,4 +151,51 @@ public class Group {
 
         return bitmap;
     }
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void removeMember(String email){
+        if(members.containsKey(email)) members.remove(email);
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", about='" + about + '\'' +
+                ", visibility='" + visibility + '\'' +
+                ", members=" + members +
+                ", profilePicture=" + profilePicture +
+                '}';
+    }
+
+
+    // ─── Parcelable boilerplate ───
+    protected Group(Parcel in) {
+        id         = in.readString();
+        name       = in.readString();
+        about      = in.readString();
+        visibility = in.readString();
+        members    = (HashMap<String, String>) in.readSerializable();
+    }
+
+    @Override public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(about);
+        dest.writeString(visibility);
+        dest.writeSerializable(members);
+    }
+
+    @Override public int describeContents() { return 0; }
+
+    public static final Creator<Group> CREATOR = new Creator<Group>() {
+        @Override public Group createFromParcel(Parcel in) { return new Group(in); }
+        @Override public Group[] newArray(int size) { return new Group[size]; }
+    };
 }
