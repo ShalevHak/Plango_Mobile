@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:background="?attr/colorSecondary">
+
+    <ImageButton
+        android:id="@+id/btnGoBackFromGroup"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:background="@android:color/transparent"
+        app:tint="?attr/colorSecondaryText"
+        android:src="@drawable/icon_go_back_48" />
+
+    <ImageButton
+        android:id="@+id/btnGroupInfo"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:background="@android:color/transparent"
+        app:tint="?attr/colorSecondaryText"
+        android:src="@drawable/icon_info_48" />
+
+    <ImageButton
+        android:id="@+id/btnGroupCalendar"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:background="@android:color/transparent"
+        app:tint="?attr/colorSecondaryText"
+        android:src="@drawable/icon_calendar_48" />
+
+    <ImageButton
+        android:id="@+id/btnGroupUpdates"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        app:tint="?attr/colorSecondaryText"
+        android:background="@android:color/transparent"
+        android:src="@drawable/icon_channel_48" />
+</LinearLayout>

@@ -1,25 +1,32 @@
 package com.example.calendarapp.Activities;
 
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.calendarapp.Components.ToolbarComponent;
-import com.example.calendarapp.Fragments.UserFragment;
+import com.example.calendarapp.API.Interfaces.Group;
+import com.example.calendarapp.Components.Toolbars.GroupToolbarComponent;
+import com.example.calendarapp.Fragments.Groups.GroupInfoFragment;
+import com.example.calendarapp.Managers.GroupsManager;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.NetworkUtil;
 
 public class GroupActivity extends AppCompatActivity {
 
     private FrameLayout flFragmentContainerGroup;
-    private ToolbarComponent toolbar;
+    private FragmentManager fragmentManager;
+    private GroupToolbarComponent toolbar;
+
+    private static Group currentGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,15 +42,41 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void initActivity() {
+
+        String groupId = getIntent().getStringExtra("groupId");
         NetworkUtil.registerNetworkCallback(this);
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        this.fragmentManager = getSupportFragmentManager();
         this.flFragmentContainerGroup = findViewById(R.id.flFragmentContainerGroup);
-        fragmentManager.beginTransaction()
-                .replace(flFragmentContainerGroup.getId(), new UserFragment())
-                .addToBackStack(null) // Optional: Adds the transaction to the back stack
-                .commit();
-        this.toolbar = findViewById(R.id.tbMain);
-        // todo: fix
-        this.toolbar.initFragmentManagement(flFragmentContainerGroup,fragmentManager);
+        this.toolbar = findViewById(R.id.tbGroup);
+
+
+        if (groupId != null) {
+            fetchGroup(groupId); // or from local cache
+        }
+        else{
+            Toast.makeText(this,"No group to show",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void fetchGroup(String groupId) {
+        GroupsManager.getInstance().getGroupById(groupId)
+                .thenAccept(group ->{
+                    currentGroup = group;
+                    Fragment fragment = GroupInfoFragment.newInstance(currentGroup);
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(flFragmentContainerGroup.getId(), fragment)
+                            .commit();
+
+                    this.toolbar.initFragmentManagement(flFragmentContainerGroup,fragmentManager);
+                })
+                .exceptionally(e ->{
+                    Log.e("GroupActivity","Unable to load group: " + groupId + "\n" + e.toString());
+                    return null;
+                });
+    }
+
+    public static Group getCurrentGroup() {
+        return currentGroup;
     }
 }
