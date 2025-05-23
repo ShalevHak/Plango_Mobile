@@ -30,7 +30,9 @@ import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.NetworkUtil;
 import com.example.calendarapp.Utils.ThemeUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class CreateGroupActivity extends AppCompatActivity {
 
@@ -54,6 +56,8 @@ public class CreateGroupActivity extends AppCompatActivity {
     private String sourceActivity;
     private String originalGroupId;
 
+    private Group currentGroup = new Group("");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         NetworkUtil.registerNetworkCallback(this);
 
         sourceActivity = getIntent().getStringExtra("source_activity");
-        originalGroupId = getIntent().getStringExtra("original_group_id");
+        originalGroupId = getIntent().getStringExtra("groupId");
 
         // Initialize views
         editTextGroupName = findViewById(R.id.editTextGroupName);
@@ -116,6 +120,48 @@ public class CreateGroupActivity extends AppCompatActivity {
         // Cancel Button
         btnCancel = findViewById(R.id.btnCancelGroup);
         btnCancel.setOnClickListener(v -> goBackToSourceActivity());
+
+        // Display values from group
+        if(originalGroupId != null && !originalGroupId.isEmpty()){
+            updateFormFields();
+        }
+    }
+
+    private void updateFormFields() {
+        GroupsManager.getInstance().getGroupById(originalGroupId)
+                .thenAccept(group ->{
+                    this.currentGroup = group;
+
+                    // Set group name & about
+                    editTextGroupName.setText(group.getName());
+                    editTextAbout.setText(group.getAbout());
+
+                    // Set color spinner selection
+                    selectedColorName = group.getColor();
+
+                    List<String> colorNamesList = Arrays.asList(ThemeUtils.eventColorsNames);
+                    int position = colorNamesList.indexOf(selectedColorName);
+
+                    if (position == -1) position = 0;
+
+                    spinnerGroupColor.setSelection(position); // This will trigger onItemSelected
+
+
+                    // Set visibility spinner
+                    if (group.getVisibility().equalsIgnoreCase("public")) {
+                        spinnerVisibility.setSelection(1); // Public
+                    } else {
+                        spinnerVisibility.setSelection(0); // Private
+                    }
+
+                    // Set members
+                    selectedMembers = new HashMap<>(group.getMembers()); // assuming key = email, value = userId or role
+                    updateMembersUI();
+                })
+                .exceptionally(e ->{
+                    Log.e("CreateGroupActivity","Unable to load group: " + originalGroupId + "\n" + e.toString());
+                    return null;
+                });
     }
 
     private void setupColorPicker(Context context) {
@@ -153,16 +199,26 @@ public class CreateGroupActivity extends AppCompatActivity {
             return;
         }
 
-        Group newGroup = new Group(name,about,selectedColorName, visibility, selectedMembers);
+        currentGroup = new Group(name,about,selectedColorName, visibility, selectedMembers);
+        if(currentGroup == null) {
+            Log.e("CreateGroupActivity","Error!");
+        }
         if (originalGroupId != null && !originalGroupId.isEmpty()) {
-            GroupsManager.getInstance().updateGroup(originalGroupId, newGroup)
-                    .thenRun(this::goBackToSourceActivity)
+            GroupsManager.getInstance().updateGroup(originalGroupId, currentGroup)
+                    .thenAccept( group -> {
+                        currentGroup = group;
+                        if(group == null){
+                            Toast.makeText(this,"Updated group was null. Going back to Content Activity",Toast.LENGTH_LONG).show();
+                            sourceActivity = "ContentActivity";
+                        }
+                        goBackToSourceActivity();
+                    })
                     .exceptionally(e -> {
                         Log.e("CreateGroupActivity", "Could not update group: " + e.getMessage() + "\n" + e.toString());
                         return null;
                     });
         } else {
-            GroupsManager.getInstance().createGroup(newGroup)
+            GroupsManager.getInstance().createGroup(currentGroup)
                     .thenRun(this::goBackToSourceActivity)
                     .exceptionally(e -> {
                         Log.e("CreateGroupActivity", "Could not create group: " + e.getMessage());
@@ -179,6 +235,13 @@ public class CreateGroupActivity extends AppCompatActivity {
             case "ContentActivity":
                 returnIntent = new Intent(this, ContentActivity.class);
                 returnIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(returnIntent);
+                finish();
+                break;
+            case "GroupActivity":
+                returnIntent = new Intent(this, GroupActivity.class);
+                String groupId = currentGroup.getId();
+                returnIntent.putExtra("groupId",groupId);
                 startActivity(returnIntent);
                 finish();
                 break;
@@ -204,7 +267,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         HashMap<String, String> tempSelectedMembers = new HashMap<>(selectedMembers);
 
         // Refresh dialog UI with temp members
-        refreshEditMembersUI(layoutCurrentMembers, tempSelectedMembers);
+        refreshEditMembersDialogUI(layoutCurrentMembers, tempSelectedMembers);
 
         // Search listener
         btnSearchEmail.setOnClickListener(btn -> {
@@ -222,7 +285,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
                         buttonAddFoundUser.setOnClickListener(v -> {
                             tempSelectedMembers.put(user.getEmail(), "member");
-                            refreshEditMembersUI(layoutCurrentMembers, tempSelectedMembers);
+                            refreshEditMembersDialogUI(layoutCurrentMembers, tempSelectedMembers);
                             Toast.makeText(this, "User added as member", Toast.LENGTH_SHORT).show();
                         });
                     }))
@@ -251,7 +314,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     }
 
 
-    private void refreshEditMembersUI(LinearLayout layout, HashMap<String, String> members) {
+    private void refreshEditMembersDialogUI(LinearLayout layout, HashMap<String, String> members) {
         layout.removeAllViews();
         for (String email : members.keySet()) {
             LinearLayout row = new LinearLayout(this);
@@ -266,7 +329,7 @@ public class CreateGroupActivity extends AppCompatActivity {
             removeBtn.setText("Remove");
             removeBtn.setOnClickListener(v -> {
                 members.remove(email);
-                refreshEditMembersUI(layout, members);
+                refreshEditMembersDialogUI(layout, members);
             });
 
             row.addView(emailView);

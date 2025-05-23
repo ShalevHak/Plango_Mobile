@@ -72,16 +72,6 @@
                 android:id="@+id/spinnerVisibility"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
-            <!-- Submit Button -->
-            <Button
-                android:id="@+id/btnSaveGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Save Group"
-                android:layout_marginTop="16dp" />
-
-
             <LinearLayout
                 android:layout_marginTop="16dp"
                 android:orientation="vertical"
@@ -118,6 +108,15 @@
                     android:layout_height="wrap_content"
                     android:text="Edit Members" />
             </LinearLayout>
+
+
+            <!-- Submit Button -->
+            <Button
+                android:id="@+id/btnSaveGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save Group"
+                android:layout_marginTop="16dp" />
             <Button
                 android:id="@+id/btnCancelGroup"
                 android:layout_width="wrap_content"
