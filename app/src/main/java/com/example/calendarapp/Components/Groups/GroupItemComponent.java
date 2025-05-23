@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -85,7 +86,11 @@ public class GroupItemComponent extends LinearLayout implements IComponent, View
 
     @Override
     public void onClick(View v) {
+
         Intent intent = new Intent(this.getContext(), GroupActivity.class);
+        intent.putExtra("groupId", group.getId());
+        intent.putExtra("source_activity","ContentActivity");
+        Log.i("GroupItemComponent","Clicked group: \n" + group.toString());
         this.getContext().startActivity(intent);
     }
 

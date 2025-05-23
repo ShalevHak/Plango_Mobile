@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class DayCalendar2 extends LinearLayout implements IComponent {
+public class DayCalendarComponent2 extends LinearLayout implements IComponent {
     private  String calendarId = null;
     private TextView tvDayOfMonth, tvMonth, tvYear;
     private ViewPager2 viewPager;
@@ -26,23 +26,23 @@ public class DayCalendar2 extends LinearLayout implements IComponent {
     private int pagerPos;
 
     private CalendarDayPagerAdapter adapter;
-    public DayCalendar2(Context context, String calendarId) {
+    public DayCalendarComponent2(Context context, String calendarId) {
         super(context);
         initComponent(context);
         this.calendarId = calendarId;
     }
 
-    public DayCalendar2(Context context, @Nullable AttributeSet attrs) {
+    public DayCalendarComponent2(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initComponent(context);
     }
 
-    public DayCalendar2(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public DayCalendarComponent2(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initComponent(context);
     }
 
-    public DayCalendar2(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public DayCalendarComponent2(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initComponent(context);
     }
@@ -85,37 +85,37 @@ public class DayCalendar2 extends LinearLayout implements IComponent {
     }
 
     private void setViewPagerListener() {
-            viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-                boolean ignoreNextStateChange = true; // Flag to suppress unnecessary callback triggers
-                @Override
-                public void onPageScrollStateChanged(int state) {
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            boolean ignoreNextStateChange = true; // Flag to suppress unnecessary callback triggers
+            @Override
+            public void onPageScrollStateChanged(int state) {
 
-                    if (state == ViewPager2.SCROLL_STATE_IDLE && !ignoreNextStateChange) {
-                        // Adjust the calendar and reset to the middle page
+                if (state == ViewPager2.SCROLL_STATE_IDLE && !ignoreNextStateChange) {
+                    // Adjust the calendar and reset to the middle page
 
-                        // Update calendar based on Swiped direction
-                        updateCalendar(pagerPos);
+                    // Update calendar based on Swiped direction
+                    updateCalendar(pagerPos);
 
-                        // Update the title
-                        updateDateTitle();
+                    // Update the title
+                    updateDateTitle();
 
-                        // Reset to page 1 without animation and without unwanted recursive call to onPageScrollStateChanged
-                        resetToMiddlePage();
-                    }
-                    if(ignoreNextStateChange) ignoreNextStateChange = false;
+                    // Reset to page 1 without animation and without unwanted recursive call to onPageScrollStateChanged
+                    resetToMiddlePage();
                 }
-                public void onPageSelected(int position) {
-                    super.onPageSelected(position);
-                    pagerPos = position; // Track the current page
-                }
-                private void resetToMiddlePage() {
-                    ignoreNextStateChange = true;
-                    viewPager.setCurrentItem(1, false);
-                    viewPager.getAdapter().notifyDataSetChanged();
-                }
+                if(ignoreNextStateChange) ignoreNextStateChange = false;
+            }
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                pagerPos = position; // Track the current page
+            }
+            private void resetToMiddlePage() {
+                ignoreNextStateChange = true;
+                viewPager.setCurrentItem(1, false);
+                viewPager.getAdapter().notifyDataSetChanged();
+            }
 
-            });
-        }
+        });
+    }
 
         private void updateCalendar(int pagerPos) {
             if (pagerPos == 0) { // Swiped to "previous day"

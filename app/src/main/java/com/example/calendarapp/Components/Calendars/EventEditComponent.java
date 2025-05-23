@@ -255,7 +255,6 @@ public class EventEditComponent extends LinearLayout implements IComponent {
                 Toast.makeText(context, "Event Saved: " + savedEvent.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     // Interface for event saving callback

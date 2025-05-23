@@ -28,7 +28,7 @@ import com.example.calendarapp.Utils.ThemeUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
+import java.util.Locale;    
 
 public class EventComponent2 extends FrameLayout implements IComponent, View.OnClickListener {
     private Event event;

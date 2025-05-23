@@ -1,4 +1,4 @@
-package com.example.calendarapp.Fragments;
+package com.example.calendarapp.Fragments.Content;
 
 import android.app.AlertDialog;
 import android.content.Intent;
