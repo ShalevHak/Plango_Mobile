@@ -1,0 +1,39 @@
+@startuml
+title Managers and Utilities
+
+' Stereotype to indicate singleton
+skinparam class {
+    BackgroundColor<<singleton>> LightYellow
+    BorderColor<<singleton>> Orange
+    FontColor Black
+}
+
+
+class CalendarsManager <<singleton>> {
+    - static CalendarsManager calendarsManager
+    - Calendar currentCalendar
+    + static CalendarsManager getInstance()
+}
+
+class GroupsManager <<singleton>> {
+    - static GroupsManager groupsManager
+    - API api
+    + static GroupsManager getInstance()
+}
+
+class UsersManager <<singleton>> {
+    + static UsersManager usersManager
+    + static UsersManager getInstance()
+}
+
+package Utils {
+    class NetworkUtil
+    class ThemeUtils
+    class TimeUtils
+}
+
+GroupsManager --> API: uses
+UsersManager --> API: uses
+CalendarsManager --> API: uses
+
+@enduml

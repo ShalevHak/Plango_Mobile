@@ -1,0 +1,46 @@
+@startuml
+' Title
+title PlanGo - Activity to Fragment Relationship
+
+' Define Activities
+class ContentActivity extends AppCompatActivity {
+    - ToolbarComponent toolbar
+    - FrameLayout flFragmentContainer
+}
+
+class CreateGroupActivity extends AppCompatActivity {
+    - String sourceActivity
+    - String originalGroupId
+    - Group currentGroup
+}
+
+class GroupActivity extends AppCompatActivity {
+    - FrameLayout flFragmentContainerGroup
+    - FragmentManager fragmentManager
+    - GroupToolbarComponent toolbar
+}
+
+class MainActivity extends AppCompatActivity
+
+' Define Fragments
+class CalendarFragment extends Fragment
+class GroupsFragment extends Fragment
+class UserInfoFragment extends Fragment
+class GroupCalendarFragment extends Fragment
+class GroupInfoFragment extends Fragment
+class GroupUpdatesFragment extends Fragment
+
+' Define Interfaces
+UserInfoFragment ..|> IComponent
+
+' Relationships
+ContentActivity --> CalendarFragment : uses
+ContentActivity --> GroupsFragment : uses
+ContentActivity --> UserInfoFragment : uses
+
+
+GroupActivity --> GroupCalendarFragment : uses
+GroupActivity --> GroupInfoFragment : uses
+GroupActivity --> GroupUpdatesFragment : uses
+
+@enduml

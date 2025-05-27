@@ -1,0 +1,137 @@
+@startuml
+
+package calendarapp.API {
+
+    class API {
+            - {static} PROTOCOL: String
+            - {static} API_IP: String
+            - {static} API_PORT: String
+            - {static} BASE_ROUTE: String
+            - {static} api: API
+            - {static} context: Context
+            + groupsService: GroupsService
+            + calendarsService: CalendarsService
+            + activitiesService: ActivitiesService
+            + usersService: UsersService
+        }
+
+    package TokenManagement {
+        class TokenManager {
+            ' Manages authentication tokens
+            ' (Properties are internal or managed by getInstance/init)
+        }
+    }
+
+    package Interceptors {
+        class AuthInterceptor {
+            - tokenManager: TokenManager
+        }
+    }
+
+    ' External/Library classes, shown for relationship clarity
+    class OkHttpClient {
+        ' HTTP client
+    }
+    class Retrofit {
+        ' Type-safe HTTP client for Android and Java
+    }
+
+    package Services {
+        abstract class AbstractAPIService<Helper> {
+            # retrofit: Retrofit
+            # fetchingHelper: Helper
+            # {static} tokenManager: TokenManager
+            # {static} client: OkHttpClient
+        }
+
+        class ActivitiesService extends AbstractAPIService<ActivitiesHelper> {
+            - EVENTS_URL: String
+        }
+
+        class CalendarsService extends AbstractAPIService<CalendarHelper> {
+            - CALENDARS_URL: String
+        }
+
+        class GroupsService extends AbstractAPIService<GroupHelper> {
+            - GROUP_URL: String
+        }
+
+        class UsersService extends AbstractAPIService<UsersHelper> {
+            - USER_URL: String
+        }
+    }
+
+    package FetchingHelpers {
+        interface ActivitiesHelper
+        interface CalendarHelper
+        interface GroupHelper
+        interface UsersHelper
+    }
+
+    package Interfaces {
+        class Event {
+            - id: String
+            - title: String
+            - description: String
+            - startDate: Date
+            - endDate: Date
+            - fullDay: Boolean
+            - color: String
+        }
+
+        class Group {
+            - id: String
+            - name: String
+            - color: String
+            - about: String
+            - visibility: String
+            - members: HashMap<String,String>
+            - profilePicture: Bitmap
+        }
+
+        class User {
+            - id: String
+            - name: String
+            - about: String
+            - email: String
+            - scheduleId: String
+            - systemRole: String
+            - groupIds: List<String>
+            - coverImgPath: String
+        }
+    }
+    API *-- GroupsService
+    API *-- CalendarsService
+    API *-- ActivitiesService
+    API *-- UsersService
+    API ..> TokenManager
+}
+
+' Relationships
+
+
+AbstractAPIService ..> TokenManager : uses (static ref for tokenManager field)
+AbstractAPIService ..> OkHttpClient : uses (static ref for client field)
+AbstractAPIService o-- Retrofit : retrofit (instance field)
+
+OkHttpClient ..> AuthInterceptor : configures with
+AuthInterceptor --> TokenManager : tokenManager (instance field)
+
+' Inheritance is already shown with "extends" keyword in class definition for brevity
+' ActivitiesService --|> AbstractAPIService (Implied by "extends ActivitiesService extends AbstractAPIService<ActivitiesHelper>")
+' CalendarsService --|> AbstractAPIService
+' GroupsService --|> AbstractAPIService
+' UsersService --|> AbstractAPIService
+
+ActivitiesService ..> ActivitiesHelper : uses as Helper (generic type for fetchingHelper)
+CalendarsService ..> CalendarHelper : uses as Helper
+GroupsService ..> GroupHelper : uses as Helper
+UsersService ..> UsersHelper : uses as Helper
+
+
+
+' Note: Context, Bitmap, Date are treated as attribute types and not drawn as separate classes.
+' HashMap<String,String> and List<String> are attributes.
+' Request and Response classes are omitted as per requirements.
+
+@enduml

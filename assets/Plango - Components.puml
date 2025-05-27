@@ -1,0 +1,70 @@
+@startuml
+title Calendar UI Components and Adapters
+
+package Components {
+    class AuthComponent extends LinearLayout implements IComponent {
+        - boolean isSignIn
+        - View signInView, signUpView
+        - API api
+    }
+
+    class DayCalendarComponent2 extends LinearLayout implements IComponent {
+        - ViewPager2 viewPager
+        - CalendarsManager calendarsManager
+        - int pagerPos
+        - String calendarId
+    }
+
+    class DayComponent extends LinearLayout implements IComponent {
+        - CalendarsManager calendarsManager
+        - String calendarId
+    }
+
+    class EventComponent2 extends FrameLayout implements IComponent, View.OnClickListener {
+        - Event event
+        - DayComponent parent
+    }
+
+    class EventEditComponent extends LinearLayout implements IComponent {
+        - OnEventSaveListener listener
+    }
+
+    class GroupItemComponent extends LinearLayout implements IComponent, View.OnClickListener {
+        - Group group
+    }
+
+    class GroupsRecycler extends RecyclerView implements IComponent {
+    }
+
+    abstract class AbstractToolbarComponent extends LinearLayout implements IComponent {
+        # FragmentManager fragmentManager
+        # Class<? extends Fragment> currentFragmentClass
+        # int selectedBtnId
+    }
+
+    class GroupToolbarComponent extends AbstractToolbarComponent implements IComponent {
+    }
+
+    class ToolbarComponent extends AbstractToolbarComponent implements IComponent {
+    }
+
+    class UserInfoComponent extends LinearLayout implements IComponent {
+    }
+
+    class CalendarDayPagerAdapter extends RecyclerView.Adapter {
+    }
+
+    class GroupsRecyclerAdapter extends RecyclerView.Adapter {
+    }
+}
+
+' Relationships (usage)
+DayCalendarComponent2 --> CalendarDayPagerAdapter : uses
+GroupsRecycler --> GroupsRecyclerAdapter : uses
+GroupsRecyclerAdapter -->  GroupItemComponent: uses
+DayCalendarComponent2 --> DayComponent : ViewPager pages
+DayComponent --> EventComponent2 : contains
+EventComponent2 --> EventEditComponent : opens
+EventEditComponent --> Event : edits
+
+@enduml
