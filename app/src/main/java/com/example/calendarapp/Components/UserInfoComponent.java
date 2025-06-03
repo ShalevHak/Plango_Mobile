@@ -3,7 +3,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -11,11 +13,16 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.Interfaces.User;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.function.BiFunction;
 
 public class UserInfoComponent extends LinearLayout implements IComponent {
     public UserInfoComponent(Context context) {
@@ -43,46 +50,66 @@ public class UserInfoComponent extends LinearLayout implements IComponent {
     }
 
     private void updateInfoUI(User user) {
-        // Set layout orientation and padding
-        this.setOrientation(HORIZONTAL);
-        this.setPadding(16, 16, 16, 16);
-        this.setBackgroundColor(Color.WHITE); // White background
-        this.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        this.setElevation(8); // Add shadow effect (if API >= 21)
-        this.setGravity(Gravity.CENTER_VERTICAL);
         Context context = getContext();
-        // Add user profile picture (optional placeholder)
-        ImageView profileImage = new ImageView(context);
-        profileImage.setLayoutParams(new LayoutParams(100, 100)); // Fixed size
-        profileImage.setImageResource(R.drawable.user_icon); // Replace with a real profile picture or placeholder
-        profileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        this.addView(profileImage);
+        removeAllViews(); // Clear previous views
 
-        // Add a vertical layout for user details
-        LinearLayout userDetailsLayout = new LinearLayout(context);
-        userDetailsLayout.setOrientation(VERTICAL);
-        userDetailsLayout.setPadding(16, 0, 0, 0); // Padding between image and text
-        userDetailsLayout.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        ScrollView scrollView = new ScrollView(context);
+        scrollView.setLayoutParams(new LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+        scrollView.setPadding(32, 32, 32, 32);
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 
-        // Add user display name (optional)
-        TextView displayNameText = new TextView(context);
-        displayNameText.setText("Name: " + user.getName()); // Assuming `user` has a `name` field
-        displayNameText.setTextSize(14);
-        displayNameText.setTextColor(Color.GRAY);
-        displayNameText.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        userDetailsLayout.addView(displayNameText);
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setLayoutParams(new LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
 
-        // Add user email
-        TextView emailText = new TextView(context);
-        emailText.setText("Email: " + user.getEmail());
-        emailText.setTextSize(16);
-        emailText.setTextColor(Color.BLACK);
-        emailText.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        userDetailsLayout.addView(emailText);
+        scrollView.addView(container);
+        this.addView(scrollView);
 
-        // Add the user details layout to the main component
-        this.addView(userDetailsLayout);
+        // Utility to create readonly TextInput field
+        BiFunction<String, String, View> createField = (label, value) -> {
+            TextInputLayout layout = new TextInputLayout(context, null, com.google.android.material.R.style.Widget_MaterialComponents_TextInputLayout_OutlinedBox);
+            layout.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            layout.setHint(label);
+            layout.setBoxStrokeColor(ContextCompat.getColor(context, R.color.backgroundLightSecondary)); // optional
+            layout.setBoxBackgroundColor(Color.TRANSPARENT);
+
+            TextInputEditText input = new TextInputEditText(context);
+            input.setText(value);
+            input.setEnabled(false);
+            input.setFocusable(false);
+            input.setCursorVisible(false);
+            input.setTextColor(Color.DKGRAY);
+            input.setTextSize(16);
+            layout.addView(input);
+            return layout;
+        };
+
+        // Add fields
+        container.addView(createField.apply("Name", user.getName()));
+        container.addView(createField.apply("Email", user.getEmail()));
+        if (user.getAbout() != null && !user.getAbout().isEmpty()) {
+            container.addView(createField.apply("About", user.getAbout()));
+        }
+
+        ImageView imageView = new ImageView(context);
+        LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(200, 200);
+        imageParams.setMargins(0, 32, 0, 32);
+        imageParams.gravity = Gravity.CENTER_HORIZONTAL;
+        imageView.setLayoutParams(imageParams);
+        imageView.setImageResource(R.drawable.user_icon);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        container.addView(imageView, 0); // Insert at the top
     }
+
 
     public void updateInfo() {
 
