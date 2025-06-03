@@ -32,7 +32,7 @@
         android:layout_height="100dp"
         android:background="@android:color/transparent"
         app:tint="?attr/colorSecondaryText"
-        android:src="@drawable/icon_calendar_48" />
+        android:src="@drawable/icon_group_calendar_48" />
 
     <ImageButton
         android:id="@+id/btnGroupUpdates"
@@ -41,5 +41,5 @@
         android:layout_height="100dp"
         app:tint="?attr/colorSecondaryText"
         android:background="@android:color/transparent"
-        android:src="@drawable/icon_channel_48" />
+        android:src="@drawable/icon_updates_48" />
 </LinearLayout>
