@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,30 +22,36 @@ import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.ThemeUtils;
+import com.example.calendarapp.Utils.TimeUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class EventEditComponent extends LinearLayout implements IComponent {
 
-    private EditText etEventTitle, etEventDescription, etStartDate, etEndDate, etStartTime, etEndTime;
-    private Button btnSaveEvent;
-    private Calendar startCalendar, endCalendar;
-    private SimpleDateFormat dateFormat, timeFormat;
-    private TextInputLayout tilEventTitle;
-    private TextInputLayout tilEventDescription;
-    private TextInputLayout tilEndTime;
-    private Spinner spinnerEventColor;
-    private View viewColorPreview;
-    private int selectedColorAttr;
-    private String selectedColorName;
+    // ───────────────────────────────── UI references ──────────────────────────
+    private EditText etTitle, etDescription, etStartDate, etStartTime, etEndDate, etEndTime;
+    private TextInputLayout tilTitle, tilDescription, tilEndTime;
+    private View colorPreview;
+    private Spinner colorSpinner;
+    private Button  btnSave;
 
-    // Predefined color names and IDs
-    private static final int[] eventColors = ThemeUtils.eventColorsID;
-    private static final String[] colorNames = ThemeUtils.eventColorsNames;
+    // ─────────────────────────────── helpers ──────────────────────────────────
+    private final Calendar startCal = Calendar.getInstance();
+    private final Calendar endCal   = Calendar.getInstance();
+
+    private final SimpleDateFormat DATE_FMT = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    private final SimpleDateFormat TIME_FMT = new SimpleDateFormat("HH:mm",      Locale.getDefault());
+
+    // colour arrays come from ThemeUtils so we can skin the app later
+    private static final int[]    COLOR_ATTRS = ThemeUtils.eventColorsID;
+    private static final String[] COLOR_NAMES = ThemeUtils.eventColorsNames;
+    private int    selectedColorAttr = COLOR_ATTRS[0];
+    private String selectedColorName = COLOR_NAMES[0];
 
     public EventEditComponent(Context context) {
         super(context);
@@ -63,172 +71,145 @@ public class EventEditComponent extends LinearLayout implements IComponent {
     @Override
     public void initComponent(Context context) {
         LayoutInflater.from(context).inflate(R.layout.event_edit_component, this, true);
-
-        tilEventTitle = findViewById(R.id.tilEventTitle);
-        tilEventDescription = findViewById(R.id.tilEventDescription);
-        tilEndTime =  findViewById(R.id.tilEndTime);
-
-        etEventTitle = findViewById(R.id.etEventTitle);
-        etEventDescription = findViewById(R.id.etEventDescription);
-        etStartDate = findViewById(R.id.etStartDate);
-        etEndDate = findViewById(R.id.etEndDate);
-        etStartTime = findViewById(R.id.etStartTime);
-        etEndTime = findViewById(R.id.etEndTime);
-        btnSaveEvent = findViewById(R.id.btnSaveEvent);
-        spinnerEventColor = findViewById(R.id.spinnerEventColor);
-        viewColorPreview = findViewById(R.id.viewColorPreview);
+        bindViews();
+        bindPickers(context);
 
 
-
-        startCalendar = Calendar.getInstance();
-        endCalendar = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-
-        // Date Picker Listeners
-        etStartDate.setOnClickListener(v -> showDatePickerDialog(context, startCalendar, etStartDate));
-        etEndDate.setOnClickListener(v -> showDatePickerDialog(context, endCalendar, etEndDate));
-
-        // Time Picker Listeners
-        etStartTime.setOnClickListener(v -> showTimePickerDialog(context, startCalendar, etStartTime));
-        etEndTime.setOnClickListener(v -> showTimePickerDialog(context, endCalendar, etEndTime));
-
-        btnSaveEvent.setOnClickListener(v -> saveEvent(context));
+        btnSave.setOnClickListener(v -> saveEvent(context));
 
         setupColorPicker(context);
     }
 
-    // Method to display DatePickerDialog
-    private void showDatePickerDialog(Context context, Calendar calendar, EditText dateEditText) {
-        new DatePickerDialog(context, (view, year, month, dayOfMonth) -> {
-            calendar.set(year, month, dayOfMonth);
-            dateEditText.setText(dateFormat.format(calendar.getTime()));
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-    }
-    private void showTimePickerDialog(Context context, Calendar calendar, EditText targetEditText) {
-        new TimePickerDialog(context, (view, hourOfDay, minute) -> {
-            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            calendar.set(Calendar.MINUTE, minute);
-            targetEditText.setText(timeFormat.format(calendar.getTime()));
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
+    private void bindViews() {
+        tilTitle = findViewById(R.id.tilEventTitle);
+        tilDescription = findViewById(R.id.tilEventDescription);
+        tilEndTime = findViewById(R.id.tilEndTime);
+
+        etTitle = findViewById(R.id.etEventTitle);
+        etDescription = findViewById(R.id.etEventDescription);
+        etStartDate = findViewById(R.id.etStartDate);
+        etEndDate = findViewById(R.id.etEndDate);
+        etStartTime = findViewById(R.id.etStartTime);
+        etEndTime = findViewById(R.id.etEndTime);
+        btnSave = findViewById(R.id.btnSaveEvent);
+
+        colorSpinner = findViewById(R.id.spinnerEventColor);
+        colorPreview = findViewById(R.id.viewColorPreview);
     }
 
+    private void bindPickers(Context ctx) {
+        etStartDate.setOnClickListener(v -> showDatePicker(ctx, startCal, etStartDate));
+        etEndDate  .setOnClickListener(v -> showDatePicker(ctx,   endCal, etEndDate));
+        etStartTime.setOnClickListener(v -> showTimePicker(ctx, startCal, etStartTime));
+        etEndTime  .setOnClickListener(v -> showTimePicker(ctx,   endCal, etEndTime));
+    }
+
+    private void showDatePicker(Context ctx, Calendar cal, EditText target) {
+        new DatePickerDialog(ctx, (view, y,m,d) -> {
+            cal.set(y, m, d);
+            target.setText(DATE_FMT.format(cal.getTime()));
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private void showTimePicker(Context ctx, Calendar cal, EditText target) {
+        new TimePickerDialog(ctx, (view, h, m) -> {
+            cal.set(Calendar.HOUR_OF_DAY, h);
+            cal.set(Calendar.MINUTE,      m);
+            target.setText(TIME_FMT.format(cal.getTime()));
+        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show();
+    }
+
+    private void debugLogEventTimes(String phase, Date start, Date end) {
+        SimpleDateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.getDefault());
+        utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        SimpleDateFormat localFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.getDefault());
+        localFormat.setTimeZone(TimeZone.getDefault());
+
+        Log.d("DEBUG_EVENT_TIME", "=== " + phase + " ===");
+        Log.d("DEBUG_EVENT_TIME", "Local Start: " + localFormat.format(start));
+        Log.d("DEBUG_EVENT_TIME", "UTC Start:   " + utcFormat.format(start));
+        Log.d("DEBUG_EVENT_TIME", "Local End:   " + localFormat.format(end));
+        Log.d("DEBUG_EVENT_TIME", "UTC End:     " + utcFormat.format(end));
+    }
     // Method to handle event saving
     private void saveEvent(Context context) {
-        boolean isValid = true;
-        String title = etEventTitle.getText().toString().trim();
-        String description = etEventDescription.getText().toString().trim();
-        String startDate = etStartDate.getText().toString().trim();
-        String startTime = etStartTime.getText().toString().trim();
-        String endDate = etEndDate.getText().toString().trim();
-        String endTime = etEndTime.getText().toString().trim();
+        if(!validate()) return;
+        Event event = new Event(
+                etTitle.getText().toString().trim(),
+                etDescription.getText().toString().trim(),
+                startCal.getTime(),
+                endCal.getTime(),
+                selectedColorName);
+        if(listener!=null) listener.onEventSaved(event);
+    }
 
-        // Reset errors before validation
-        tilEventTitle.setError(null);
-        tilEventDescription.setError(null);
+    private boolean validate() {
+        clearErrors();
+        boolean ok = true;
+
+        if (TextUtils.isEmpty(etTitle.getText())) {
+            tilTitle.setError("Title required");
+            ok = false;
+        }
+        if (TextUtils.isEmpty(etStartDate.getText())) {
+            etStartDate.setError("Start date");
+            ok = false;
+        }
+        if (TextUtils.isEmpty(etStartTime.getText())) {
+            etStartTime.setError("Start time");
+            ok = false;
+        }
+        if (TextUtils.isEmpty(etEndDate.getText())) {
+            etEndDate.setError("End date");
+            ok = false;
+        }
+        if (TextUtils.isEmpty(etEndTime.getText())) {
+            etEndTime.setError("End time");
+            ok = false;
+        }
+
+        if (!ok) return false;
+
+        if (endCal.before(startCal)) {
+            tilEndTime.setError("End before start");
+            return false;
+        }
+        return true;
+    }
+
+    private void clearErrors() {
+        tilTitle.setError(null);
+        tilDescription.setError(null);
         tilEndTime.setError(null);
-        etEventTitle.setError(null);
-        etEventDescription.setError(null);
         etStartDate.setError(null);
         etStartTime.setError(null);
         etEndDate.setError(null);
         etEndTime.setError(null);
-
-        // Validate required fields
-        if (title.isEmpty()) {
-            tilEventTitle.setError("Title cannot be empty");
-            isValid = false;
-        }
-        if (startDate.isEmpty()) {
-            etStartDate.setError("Start date is required");
-            isValid = false;
-        }
-        if (startTime.isEmpty()) {
-            etStartTime.setError("Start time is required");
-            isValid = false;
-        }
-        if (endDate.isEmpty()) {
-            etEndDate.setError("End date is required");
-            isValid = false;
-        }
-        if (endTime.isEmpty()) {
-            etEndTime.setError("End time is required");
-            isValid = false;
-        }
-
-        // Parse start and end times
-        try {
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            Date parsedStartTime = timeFormat.parse(startTime);
-            Date parsedEndTime = timeFormat.parse(endTime);
-
-            if (parsedStartTime != null) {
-                startCalendar.set(Calendar.HOUR_OF_DAY, parsedStartTime.getHours());
-                startCalendar.set(Calendar.MINUTE, parsedStartTime.getMinutes());
-            }
-            if (parsedEndTime != null) {
-                endCalendar.set(Calendar.HOUR_OF_DAY, parsedEndTime.getHours());
-                endCalendar.set(Calendar.MINUTE, parsedEndTime.getMinutes());
-            }
-
-            // Ensure end date/time is not before start date/time
-            if (endCalendar.before(startCalendar)) {
-                tilEndTime.setError("End time cannot be before start time");
-                isValid = false;;
-            }
-
-
-            // Create event object
-            Event event = new Event(title, description, startCalendar.getTime(), endCalendar.getTime(), selectedColorName);
-
-            // Ensure event's duration is at least 5 minutes
-            if(event.getDurationMS()<=5*1000*60){
-                tilEndTime.setError("Event's duration must be at least 5 minutes");
-                isValid = false;
-            }
-            // Notify listener
-            if(!isValid) return;
-
-            if (listener != null) {
-                listener.onEventSaved(event);
-            }
-
-        } catch (Exception e) {
-            Toast.makeText(context, "Error parsing time: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
     }
 
 
-
     // Public method to set event details
-    public void setEventDetails(Event event) {
-        if (event == null) return;
+    public void setEventDetails(Event e) {
+        if (e == null) return;
+        etTitle.setText(e.getTitle());
+        etDescription.setText(e.getDescription());
 
-        etEventTitle.setText(event.getTitle());
-        etEventDescription.setText(event.getDescription());
+        startCal.setTime(e.getStartDate());
+        endCal.setTime(e.getEndDate());
 
-        if (event.getStartDate() != null) {
-            startCalendar.setTime(event.getStartDate());
-            etStartDate.setText(dateFormat.format(event.getStartDate()));
-            etStartTime.setText(timeFormat.format(event.getStartDate()));
-        }
+        etStartDate.setText(DATE_FMT.format(startCal.getTime()));
+        etStartTime.setText(TIME_FMT.format(startCal.getTime()));
+        etEndDate.setText(DATE_FMT.format(endCal.getTime()));
+        etEndTime.setText(TIME_FMT.format(endCal.getTime()));
 
-        if (event.getEndDate() != null) {
-            endCalendar.setTime(event.getEndDate());
-            etEndDate.setText(dateFormat.format(event.getEndDate()));
-            etEndTime.setText(timeFormat.format(event.getEndDate()));
-        }
-
-        if (event.getColor() != null) {
-            int colorIndex = 0;
-            for (int i = 0; i < eventColors.length; i++) {
-                if (colorNames[i].equals(event.getColor())) {
-                    colorIndex = i;
+        if (e.getColor() != null) {
+            for (int i = 0; i < COLOR_NAMES.length; i++) {
+                if (COLOR_NAMES[i].equals(e.getColor())) {
+                    colorSpinner.setSelection(i);
                     break;
                 }
             }
-            spinnerEventColor.setSelection(colorIndex);
-           // viewColorPreview.setBackgroundColor(event.getColor());
         }
     }
     // Static method to show the event edit dialog
@@ -239,18 +220,17 @@ public class EventEditComponent extends LinearLayout implements IComponent {
             eventEditComponent.setEventDetails(event);
         }
 
-        AlertDialog.Builder editDialogBuilder = new AlertDialog.Builder(context);
-        editDialogBuilder.setTitle(event == null ? "Create Event" : "Edit Event");
-        editDialogBuilder.setView(eventEditComponent);
-        editDialogBuilder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-        AlertDialog dialog = editDialogBuilder.create();
-        dialog.show();
+        AlertDialog d = new AlertDialog.Builder(context)
+            .setTitle(event == null ? "Create Event" : "Edit Event")
+            .setView(eventEditComponent)
+            .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+            .create();
+        d.show();
 
         eventEditComponent.setOnEventSaveListener(savedEvent -> {
             if (callback != null) {
                 callback.onEventSaved(savedEvent);
-                dialog.dismiss();
+                d.dismiss();
             } else {
                 Toast.makeText(context, "Event Saved: " + savedEvent.getTitle(), Toast.LENGTH_SHORT).show();
             }
@@ -272,25 +252,25 @@ public class EventEditComponent extends LinearLayout implements IComponent {
     private void setupColorPicker(Context context) {
 
 
-        selectedColorAttr = eventColors[0];
-        selectedColorName = colorNames[0];
+        selectedColorAttr = COLOR_ATTRS[0];
+        selectedColorName = COLOR_NAMES[0];
 
         // Create a dropdown list with color names
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, colorNames);
-        spinnerEventColor.setAdapter(adapter);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, COLOR_NAMES);
+        colorSpinner.setAdapter(adapter);
 
         // Handle color selection
-        spinnerEventColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedColorName = colorNames[position];
+                selectedColorName = COLOR_NAMES[position];
                 selectedColorAttr = ThemeUtils.getColorIDFromName(selectedColorName);
-                viewColorPreview.setBackgroundColor(ThemeUtils.resolveColorFromTheme(context,selectedColorAttr));
+                colorPreview.setBackgroundColor(ThemeUtils.resolveColorFromTheme(context,selectedColorAttr));
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {spinnerEventColor.setSelection(0);}
+            public void onNothingSelected(AdapterView<?> parent) {colorSpinner.setSelection(0);}
         });
 
     }

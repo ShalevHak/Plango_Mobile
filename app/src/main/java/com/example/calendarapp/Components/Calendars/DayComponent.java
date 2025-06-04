@@ -259,7 +259,7 @@ public class DayComponent extends LinearLayout implements IComponent {
             return null;
         };
 
-        //TODO: deal with extras!
+
         List<Event> extras = new ArrayList<>();
 
         List<Event> copy = new ArrayList<>(events); // Mutable copy
@@ -281,7 +281,6 @@ public class DayComponent extends LinearLayout implements IComponent {
 
                 float leftMargin = getMaxLeftMarginForEvent.apply(event);
 
-                //TODO: limit the max number of columns to 3
 
                 // Weight is over the limit. Will cause the event to be positioned out side of the screen
                 if (leftMargin + widthWeights.getOrDefault(event,0f) > 1) {
@@ -384,6 +383,7 @@ public class DayComponent extends LinearLayout implements IComponent {
     public void editEvent(Event originalEvent, Event editedEvent) {
         calendarsManager.updateEvent(originalEvent, editedEvent, calendarId)
                 .thenAccept(e ->{
+                    Log.i("DayComponent","Event Update Succeeded");
                     clearEvents();
                     displayEvents();
                 })
