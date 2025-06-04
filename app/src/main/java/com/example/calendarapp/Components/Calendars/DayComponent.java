@@ -1,10 +1,17 @@
 package com.example.calendarapp.Components.Calendars;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -44,6 +51,8 @@ public class DayComponent extends LinearLayout implements IComponent {
     private CalendarsManager calendarsManager;
     private FloatingActionButton fabAddEvent;
     private String calendarId;
+    private Button btnExtras;
+    private AlertDialog overflowDialog = null;
 
     public DayComponent(Context context, String calendarId) {
         super(context);
@@ -77,6 +86,10 @@ public class DayComponent extends LinearLayout implements IComponent {
         hsvFullDayEvents       = findViewById(R.id.hsvFullDayEvents);
         fullDayEventContainer  = findViewById(R.id.llFullDayEvents);
         fabAddEvent            = findViewById(R.id.fabAddEvent);
+        btnExtras              = findViewById(R.id.btnExtras);
+
+        btnExtras.setVisibility(GONE); // start hidden
+
 
         // Click Listener for Adding Events
         fabAddEvent.setOnClickListener(view -> {
@@ -111,21 +124,54 @@ public class DayComponent extends LinearLayout implements IComponent {
         createHourBackground();
     }
     private void createHourBackground() {
+        hourBackground.removeAllViews();
+        int hourHeight = dp(64); // more compact, feel free to tune
+        int textPaddingTop = dp(4);
+
         for (int i = 0; i < 24; i++) {
+            FrameLayout hourBlock = new FrameLayout(getContext());
+            hourBlock.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, hourHeight));
+
+            // Divider (top line)
+            View divider = new View(getContext());
+            FrameLayout.LayoutParams dividerParams = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, dp(1));
+            dividerParams.gravity = Gravity.TOP;
+            divider.setLayoutParams(dividerParams);
+            divider.setBackgroundColor(Color.parseColor("#AAAAAA"));
+
+            // Hour label
             TextView hourLabel = new TextView(getContext());
             hourLabel.setText(formatHour(i));
-            hourLabel.setPadding(16, 32, 16, 32);  // Taller for visibility
-            hourLabel.setBackgroundColor(ThemeUtils.resolveColorFromTheme(getContext(),R.attr.colorBackground));
-            hourLabel.setTextColor(ThemeUtils.resolveColorFromTheme(getContext(),R.attr.colorPrimaryText));
-            hourLabel.setGravity(Gravity.CENTER_VERTICAL);
-            hourLabel.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    200)); // Fixed height for consistent scaling
+            hourLabel.setTextColor(ThemeUtils.resolveColorFromTheme(getContext(), R.attr.colorPrimaryText));
+            hourLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            hourLabel.setPadding(dp(8), textPaddingTop, 0, 0);
+            hourLabel.setGravity(Gravity.START);
+            hourLabel.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.TOP | Gravity.START
+            ));
 
-            hourBackground.addView(hourLabel);
+            hourBlock.addView(divider);
+            hourBlock.addView(hourLabel);
+            hourBackground.addView(hourBlock);
         }
     }
+
+
+    private int dp(int dp) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
+    }
+
     public void addEvents(List<Event> events) {
+        if (overflowDialog != null && overflowDialog.isShowing()) {
+            overflowDialog.dismiss();
+            overflowDialog = null;
+        }
+        btnExtras.setVisibility(GONE);
         if (events == null || events.isEmpty()) return;
 
         // 1) Separate full-day events from time-based events
@@ -145,16 +191,75 @@ public class DayComponent extends LinearLayout implements IComponent {
         List<UIDayEvent> uiDayEvents = organizeEvents(timed);
         if (uiDayEvents == null) return;
 
-        List<UIDayEvent> extras = uiDayEvents.stream().filter((UIDayEvent e)->e.isExtra).collect(Collectors.toList());
-
+        List<Event> overflowEvents = uiDayEvents.stream().filter((UIDayEvent e)->e.isExtra).map(ui -> ui.event).collect(Collectors.toList());
 
         uiDayEvents.removeIf((UIDayEvent e)->e.isExtra);
         // 4) Add each to the ConstraintLayout
         for (UIDayEvent uiDayEvent : uiDayEvents) {
             addUIDayEventBlock(uiDayEvent);
         }
-    }
 
+        // If extras exist, add a button to open the overflow dialog
+        if (!overflowEvents.isEmpty()) {
+            initOverflowEventsBtn(overflowEvents);
+        }
+
+    }
+    private void initOverflowEventsBtn(List<Event> overflowEvents) {
+        // Set up text and styling
+        btnExtras.setText("Show " + overflowEvents.size() + " more");
+        btnExtras.setAllCaps(false);
+        btnExtras.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        btnExtras.setTextColor(ThemeUtils.resolveColorFromTheme(getContext(), R.attr.colorPrimaryText));
+        btnExtras.setBackgroundColor(ThemeUtils.resolveColorFromTheme(getContext(), R.attr.colorBackgroundSecondary));
+        btnExtras.setPadding(dp(8), dp(4), dp(8), dp(4));
+
+        // Click shows a dialog of overflow events
+        btnExtras.setOnClickListener(v -> showOverflowDialog(overflowEvents));
+
+        // Margins and visibility
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(dp(8), dp(8), dp(8), dp(8));
+        btnExtras.setLayoutParams(params);
+
+        btnExtras.setVisibility(VISIBLE);
+    }
+    private void showOverflowDialog(List<Event> extras) {
+        // If already showing, don't create a new one
+        if (overflowDialog != null && overflowDialog.isShowing()) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Overflow Events");
+
+        ScrollView scrollView = new ScrollView(getContext());
+        LinearLayout container = new LinearLayout(getContext());
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setPadding(dp(16), dp(16), dp(16), dp(16));
+
+        int margin = dp(4);
+        ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(margin, margin, margin, margin);
+
+        for (Event event : extras) {
+            EventComponent2 eventComponent = new EventComponent2(getContext());
+            eventComponent.initOverflowEvent(event);
+            eventComponent.initParentDay(this);
+            container.addView(eventComponent, params);
+        }
+
+        scrollView.addView(container);
+        builder.setView(scrollView);
+        builder.setPositiveButton("Close", null);
+
+        overflowDialog = builder.create();
+        overflowDialog.show();
+    }
 
     // ----------------------------------------------------------------------------
     // ------------------- The Overlap/Organize Algorithm -------------------------
@@ -194,12 +299,13 @@ public class DayComponent extends LinearLayout implements IComponent {
         Function<Date, Integer> getMinuteOfDay = TimeUtils::getMinuteOfDay;
 
         // Calculate number of events in each row (5 minutes intervals)
-        int totalRows = (24 * 60) / 5;
+        final int minIntervals = 5;
+        final int totalRows = (24 * 60) / minIntervals;
         int[] rowsOverlaps = new int[totalRows];
 
-        for (int minute = 0; minute < 24 * 60; minute += 5) {
+        for (int minute = 0; minute < 24 * 60; minute += minIntervals) {
             int intervalStart = minute;
-            int intervalEnd = minute + 5;
+            int intervalEnd = minute + minIntervals;
 
             long count = events.stream()
                     .filter(event -> {
@@ -210,16 +316,16 @@ public class DayComponent extends LinearLayout implements IComponent {
                         return eventStart < intervalEnd && eventEnd > intervalStart;
                     })
                     .count();
-            rowsOverlaps[minute/5]= (int) count;
+            rowsOverlaps[minute/minIntervals]= (int) count;
         }
 
         // Helper lambda: event to rows range
         Function<Event, IntStream> getRowsRange = event ->{
             int eventStart = getMinuteOfDay.apply(event.getStartDate());
             int eventEnd = getMinuteOfDay.apply(event.getEndDate());
-            int startRow = eventStart / 5;
+            int startRow = eventStart / minIntervals;
             // Subtract 1 minute from eventEnd so that an event ending exactly at the boundary is included in the previous row.
-            int endRow = (eventEnd - 1) / 5;
+            int endRow = (eventEnd - 1) / minIntervals;
             // Use IntStream to get the range
 
             return IntStream.rangeClosed(startRow, endRow);
@@ -280,7 +386,6 @@ public class DayComponent extends LinearLayout implements IComponent {
                 iterator.remove(); // Use iterator.remove() to avoid ConcurrentModificationException
 
                 float leftMargin = getMaxLeftMarginForEvent.apply(event);
-
 
                 // Weight is over the limit. Will cause the event to be positioned out side of the screen
                 if (leftMargin + widthWeights.getOrDefault(event,0f) > 1) {

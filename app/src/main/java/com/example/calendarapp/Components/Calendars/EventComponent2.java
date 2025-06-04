@@ -5,15 +5,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,18 +23,15 @@ import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.ThemeUtils;
-import com.example.calendarapp.Utils.TimeUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class EventComponent2 extends FrameLayout implements IComponent, View.OnClickListener {
     // ────────────────────────────────────────────────────────────────────────────
     //  constants / helpers
     // ────────────────────────────────────────────────────────────────────────────
-    private static final int   MIN_HEIGHT_PX   = 50;           // ensure small events stay tappable
+    private static final int   MIN_HEIGHT_PX   = 64;           // ensure small events stay tappable
     private static final int   H_MARGIN_DP     = 4;            // horizontal gap between columns
     private static final int   V_MARGIN_DP     = 2;            // vertical gap between stacked events
 
@@ -99,14 +92,19 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
     public void initFullDayEvent(Event event) {
         this.event = event;
 
-        setColorStyle(event);
-        eventView.setText(truncateTitle(event.getTitle(), 15));
+        setStyle(event);
 
         setFullDayEventLayout();
     }
 
-    private void setColorStyle(Event event) {
+    private void setStyle(Event event) {
         eventView.setText(event.getTitle());
+        eventView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        eventView.setMaxLines(2); // Allow wrapping
+        eventView.setEllipsize(TextUtils.TruncateAt.END);
+        eventView.setLineSpacing(0, 1.2f); // Better vertical space
+        eventView.setGravity(Gravity.CENTER_VERTICAL | Gravity.START); // Align nicely
+
         Drawable backgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corner_background);
         if (backgroundDrawable != null) {
             int colorId = ThemeUtils.getColorIDFromName(event.getColor());
@@ -118,32 +116,29 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         eventView.setPadding(2, 2, 2, 2);
     }
 
-//    public void initEvent(Event event, int hourHeightPx){
-//        this.event = event;
-//
-//        setColorStyle(event);
-//
-//        // Position the event based on start time
-//        setEventLayout(hourHeightPx);
-//    }
-//
-//    private void setEventLayout(int hourHeightPx) {
-//        int top = (int) (event.getStartHour() * hourHeightPx) + dp(getContext(), V_MARGIN_DP);
-//        int height = Math.max(MIN_HEIGHT_PX, (int)(event.getDurationHours()*hourHeightPx) - dp(getContext(), V_MARGIN_DP*2));
-//
-//        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
-//                LayoutParams.MATCH_PARENT, height);
-//        lp.topMargin = top;
-//        lp.leftMargin = dp(getContext(), H_MARGIN_DP);
-//        lp.rightMargin= dp(getContext(), H_MARGIN_DP);
-//        setLayoutParams(lp);
-//    }
-
-    private void setFullDayEventLayout(){
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(getContext(),300), dp(getContext(),100));
-        lp.setMargins(dp(getContext(),H_MARGIN_DP), dp(getContext(),V_MARGIN_DP), dp(getContext(),H_MARGIN_DP), dp(getContext(),V_MARGIN_DP));
-        setLayoutParams(lp);
+    public void initOverflowEvent(Event event){
+        this.event = event;
+        setStyle(event);
     }
+
+    private void setFullDayEventLayout() {
+        int width = dp(getContext(), 300);
+        int height = dp(getContext(), MIN_HEIGHT_PX); // Ensures tappable height
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
+        lp.setMargins(dp(getContext(), H_MARGIN_DP), dp(getContext(), V_MARGIN_DP),
+                dp(getContext(), H_MARGIN_DP), dp(getContext(), V_MARGIN_DP));
+
+        setLayoutParams(lp);
+
+        // Padding ensures internal text is not squished
+        setPadding(dp(getContext(), 12), dp(getContext(), 8), dp(getContext(), 12), dp(getContext(), 8));
+
+        setMinimumHeight(height); // Enforce min height
+        setClickable(true);
+        setFocusable(true);
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -255,7 +250,7 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
     // Initialize event layout for overlapping UI scenarios using constraint positioning
     public void initOrganizedEvent(DayComponent.UIDayEvent uiDayEvent) {
         this.event = uiDayEvent.event;
-        setColorStyle(event);
+        setStyle(event);
 
 
         // Wait until the parent layout has been measured
@@ -313,6 +308,7 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         constraintSet.applyTo(parentLayout);
 
     }
+
 
 }
 

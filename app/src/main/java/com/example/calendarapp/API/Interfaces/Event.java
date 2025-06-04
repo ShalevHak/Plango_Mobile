@@ -81,7 +81,7 @@ public class Event {
     }
 
     private Boolean calcIsFullDay(Date startDate, Date endDate) {
-        return getDurationHours() >= 24;
+        return getDurationHours() >= 24 || getStartDay() != getEndDay();
     }
 
     // Utility methods
@@ -100,6 +100,16 @@ public class Event {
         return cal.get(Calendar.HOUR_OF_DAY);
     }
 
+    public int getStartDay() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        return cal.get(Calendar.DAY_OF_MONTH);
+    }
+    public int getEndDay() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(endDate);
+        return cal.get(Calendar.DAY_OF_MONTH);
+    }
     public String getFormattedStartDate() {
         return dateFormat.format(startDate);
     }

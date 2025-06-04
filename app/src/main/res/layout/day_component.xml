@@ -3,10 +3,19 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <Button
+            android:id="@+id/btnExtras"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:visibility="gone"
+            android:backgroundTint="?attr/colorBackgroundSecondary"
+            android:textColor="?attr/colorPrimaryText" />
         <!-- Full-Day Events Scrollable Row -->
         <HorizontalScrollView
             android:id="@+id/hsvFullDayEvents"
@@ -51,6 +60,8 @@
                     android:layout_height="match_parent" />
             </FrameLayout>
         </ScrollView>
+
+
     </LinearLayout>
 
     <!-- Floating Action Button for Adding Events -->
