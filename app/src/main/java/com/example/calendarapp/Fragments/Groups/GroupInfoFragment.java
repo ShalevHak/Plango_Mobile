@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.example.calendarapp.API.Interfaces.Group;
 import com.example.calendarapp.Activities.ContentActivity;
 import com.example.calendarapp.Activities.CreateGroupActivity;
+import com.example.calendarapp.Activities.GroupActivity;
 import com.example.calendarapp.Managers.GroupsManager;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.ThemeUtils;
@@ -33,22 +34,14 @@ public class GroupInfoFragment extends Fragment{
     private static final String ARG_GROUP = "arg_group";   // <-- key for Bundle
     private Group group;
 
-    // ───────────────────────── Factory ─────────────────────────
-    public static GroupInfoFragment newInstance(Group group) {
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_GROUP, group);
-        GroupInfoFragment frag = new GroupInfoFragment();
-        frag.setArguments(args);
-        return frag;
-    }
-
-    // ───────────────────────── Lifecycle ───────────────────────
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // pull the Group out of the arguments *after* the fragment is attached
-        if (getArguments() != null) {
-            group = (Group) getArguments().getParcelable(ARG_GROUP);
+
+        // Instead of reading from arguments, retrieve from Activity’s static variable:
+        group = GroupActivity.getCurrentGroup();
+        if (group == null) {
+            Log.i("GroupInfoFragment", "setupUI called but currentGroup is null!");
         }
     }
     @Nullable

@@ -62,11 +62,6 @@ public class GroupActivity extends AppCompatActivity {
         GroupsManager.getInstance().getGroupById(groupId)
                 .thenAccept(group ->{
                     currentGroup = group;
-                    Fragment fragment = GroupInfoFragment.newInstance(currentGroup);
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(flFragmentContainerGroup.getId(), fragment)
-                            .commit();
 
                     this.toolbar.initFragmentManagement(flFragmentContainerGroup,fragmentManager);
                 })

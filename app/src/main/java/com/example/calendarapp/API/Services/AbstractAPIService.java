@@ -17,7 +17,7 @@ public abstract class AbstractAPIService<Helper> {
     protected static final TokenManager tokenManager = TokenManager.getInstance();
     protected static final  OkHttpClient client = new OkHttpClient.Builder()
             .addInterceptor(new AuthInterceptor(tokenManager))
-            .build();;
+            .build();
 
     protected AbstractAPIService(Class<Helper> helperClass) {
         initRetrofit();

@@ -22,7 +22,7 @@ import com.example.calendarapp.Fragments.Content.UserInfoFragment;
 import com.example.calendarapp.Activities.MainActivity;
 import com.example.calendarapp.R;
 
-public class ToolbarComponent extends AbstractToolbarComponent {
+public class ToolbarComponent extends AbstractToolbarComponent implements IComponent {
     private ImageButton btnUser, btnGroups, btnCalendar, btnLogout;
     public ToolbarComponent(Context context) {
         super(context);

@@ -155,7 +155,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                     }
 
                     // Set members
-                    selectedMembers = new HashMap<>(group.getMembers()); // assuming key = email, value = userId or role
+                    selectedMembers = new HashMap<>(group.getMembers());
                     updateMembersUI();
                 })
                 .exceptionally(e ->{
@@ -200,6 +200,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
 
         currentGroup = new Group(name,about,selectedColorName, visibility, selectedMembers);
+        Log.i("CreateGroupActivity","Saving Group: " + currentGroup);
         if(currentGroup == null) {
             Log.e("CreateGroupActivity","Error!");
         }
@@ -221,6 +222,7 @@ public class CreateGroupActivity extends AppCompatActivity {
             GroupsManager.getInstance().createGroup(currentGroup)
                     .thenRun(this::goBackToSourceActivity)
                     .exceptionally(e -> {
+                        Toast.makeText(this,"Could not create group",Toast.LENGTH_LONG).show();
                         Log.e("CreateGroupActivity", "Could not create group: " + e.getMessage());
                         return null;
                     });
@@ -233,6 +235,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
         switch (sourceActivity){
             case "ContentActivity":
+                Log.i("CreateGroupActivity","Sending back to ContentActivity");
                 returnIntent = new Intent(this, ContentActivity.class);
                 returnIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(returnIntent);

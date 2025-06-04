@@ -61,12 +61,9 @@ public class GroupItemComponent extends LinearLayout implements IComponent, View
             this.group = new Group(""); // fallback
         }
 
-        Bitmap groupBitmap = group.getProfilePicture();
-        if (groupBitmap != null) {
-            groupIcon.setImageBitmap(groupBitmap);
-        } else {
-            groupIcon.setImageResource(R.drawable.user_icon);
-        }
+
+        groupIcon.setImageResource(R.drawable.user_icon);
+
 
         groupName.setText(group.getName());
 

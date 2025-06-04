@@ -67,14 +67,14 @@ public class GroupToolbarComponent extends AbstractToolbarComponent implements I
     @Override
     protected Class<? extends Fragment> getFragmentClassForButtonId(int id) {
         if (id == R.id.btnGroupInfo) return GroupInfoFragment.class;
-        if (id == R.id.btnGroupCalendar) return GroupCalendarFragment.class;
+        if (id == R.id.btnGroupCalendar) return CalendarFragment.class;
         if (id == R.id.btnGroupUpdates) return GroupUpdatesFragment.class;
         return GroupInfoFragment.class;
     }
 
     @Override
     protected Class<? extends Fragment> getDefaultFragmentClass() {
-        return null;
+        return GroupInfoFragment.class;
     }
 
     @Override

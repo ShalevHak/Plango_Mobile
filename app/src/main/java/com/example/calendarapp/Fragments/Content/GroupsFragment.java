@@ -33,6 +33,7 @@ public class GroupsFragment extends Fragment {
                     if (which == 0) {
                         // Start CreateGroupActivity
                         Intent intent = new Intent(requireContext(), CreateGroupActivity.class);
+                        intent.putExtra("source_activity", "ContentActivity");
                         startActivity(intent);
                     } else if (which == 1) {
                         // Show placeholder dialog
