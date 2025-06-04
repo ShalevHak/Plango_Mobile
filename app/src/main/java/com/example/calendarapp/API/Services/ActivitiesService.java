@@ -7,6 +7,9 @@ import com.example.calendarapp.API.FetchingHelpers.ActivitiesHelper;
 import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.API.Responses.EventHandlerResponse;
 import com.example.calendarapp.API.Responses.EventsResponse;
+import com.example.calendarapp.Components.Calendars.EventEditComponent;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,14 +33,19 @@ public class ActivitiesService extends AbstractAPIService<ActivitiesHelper>{
     protected void initRetrofit() {
         CALENDARS_URL =  API.getRoute("calendars");
         Log.i("ActivitiesService","Base route: "+ CALENDARS_URL);
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX") // ISO 8601 with offset
+                .create();
+
+
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(CALENDARS_URL)
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }
 
-    private static final SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+    private static final SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
     private Date parseDate(String dateString) {
         try {
