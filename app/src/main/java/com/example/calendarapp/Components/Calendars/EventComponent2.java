@@ -6,9 +6,11 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
@@ -25,16 +27,33 @@ import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Utils.ThemeUtils;
+import com.example.calendarapp.Utils.TimeUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;    
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class EventComponent2 extends FrameLayout implements IComponent, View.OnClickListener {
-    private Event event;
-    private TextView eventView;
-    private static final int MIN_HEIGHT_PX = 50; // Ensure text is always visible
-    private DayComponent parent;
+    // ────────────────────────────────────────────────────────────────────────────
+    //  constants / helpers
+    // ────────────────────────────────────────────────────────────────────────────
+    private static final int   MIN_HEIGHT_PX   = 50;           // ensure small events stay tappable
+    private static final int   H_MARGIN_DP     = 4;            // horizontal gap between columns
+    private static final int   V_MARGIN_DP     = 2;            // vertical gap between stacked events
+
+    private static int dp(Context ctx, int dp) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, ctx.getResources().getDisplayMetrics());
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────
+    //  members
+    // ────────────────────────────────────────────────────────────────────────────
+    private Event           event;
+    private TextView        eventView;
+    private DayComponent    parent;
+    private final SimpleDateFormat displayFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
 
     public EventComponent2(Context context) {
         super(context);
@@ -66,7 +85,7 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         eventView.setMaxLines(1);
         eventView.setEllipsize(TextUtils.TruncateAt.END); // Truncate with "..."
         eventView.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
-        eventView.setPadding(8, 4, 8, 4); // Reduce padding to avoid text clipping
+        eventView.setPadding(dp(context,8), dp(context,4), dp(context,8), dp(context,4));
     }
     private void ensureId() {
         if (getId() == NO_ID) {
@@ -74,71 +93,56 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         }
     }
     public void initParentDay(DayComponent dayComponent){
+        // API called by DayComponent
         this.parent = dayComponent;
     }
     public void initFullDayEvent(Event event) {
         this.event = event;
 
+        setColorStyle(event);
         eventView.setText(truncateTitle(event.getTitle(), 15));
-
-        Drawable backgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corner_background);
-        if (backgroundDrawable != null) {
-            int colorId = ThemeUtils.getColorIDFromName(event.getColor());
-            int color = ThemeUtils.resolveColorFromTheme(getContext(),colorId);
-            backgroundDrawable.setTint(color);
-            this.setBackground(backgroundDrawable);
-        }
-
-        eventView.setTextColor(Color.WHITE);
-        eventView.setPadding(16, 8, 16, 8);
-        eventView.setGravity(Gravity.CENTER);
 
         setFullDayEventLayout();
     }
 
-    public void initEvent(Event event, int hourHeightPx){
-        this.event = event;
-
-        initEventStyle(event);
-
-        // Position the event based on start time
-        setEventLayout(hourHeightPx);
-    }
-
-    private void initEventStyle(Event event) {
-        TextView eventView = this.findViewById(R.id.tvEventTitle2);
+    private void setColorStyle(Event event) {
         eventView.setText(event.getTitle());
-        //eventView.setBackgroundColor(event.getColor());
-        // Load the rounded corner background
         Drawable backgroundDrawable = ContextCompat.getDrawable(getContext(), R.drawable.round_corner_background);
         if (backgroundDrawable != null) {
             int colorId = ThemeUtils.getColorIDFromName(event.getColor());
-            int color = ThemeUtils.resolveColorFromTheme(getContext(),colorId);
-            // Apply a red tint to the background drawable
+            int color = ThemeUtils.resolveColorFromTheme(getContext(), colorId);
             backgroundDrawable.setTint(color);
-            this.setBackground(backgroundDrawable); // Set the tinted drawable as the background
+            this.setBackground(backgroundDrawable);
         }
-
-        eventView.setTextColor(0xFFFFFFFF);
+        eventView.setTextColor(Color.WHITE);
         eventView.setPadding(2, 2, 2, 2);
     }
 
-    private void setEventLayout(int hourHeightPx) {
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                (int) (event.getDurationHours() * hourHeightPx)
-        );
-        params.topMargin = (int) (event.getStartHour() * hourHeightPx);
-        this.setLayoutParams(params);
-    }
+//    public void initEvent(Event event, int hourHeightPx){
+//        this.event = event;
+//
+//        setColorStyle(event);
+//
+//        // Position the event based on start time
+//        setEventLayout(hourHeightPx);
+//    }
+//
+//    private void setEventLayout(int hourHeightPx) {
+//        int top = (int) (event.getStartHour() * hourHeightPx) + dp(getContext(), V_MARGIN_DP);
+//        int height = Math.max(MIN_HEIGHT_PX, (int)(event.getDurationHours()*hourHeightPx) - dp(getContext(), V_MARGIN_DP*2));
+//
+//        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
+//                LayoutParams.MATCH_PARENT, height);
+//        lp.topMargin = top;
+//        lp.leftMargin = dp(getContext(), H_MARGIN_DP);
+//        lp.rightMargin= dp(getContext(), H_MARGIN_DP);
+//        setLayoutParams(lp);
+//    }
 
-    private void setFullDayEventLayout() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                300, // Fixed width for each full-day event
-                100  // Fixed height
-        );
-        params.setMargins(10, 5, 10, 5);
-        this.setLayoutParams(params);
+    private void setFullDayEventLayout(){
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(getContext(),300), dp(getContext(),100));
+        lp.setMargins(dp(getContext(),H_MARGIN_DP), dp(getContext(),V_MARGIN_DP), dp(getContext(),H_MARGIN_DP), dp(getContext(),V_MARGIN_DP));
+        setLayoutParams(lp);
     }
 
     @Override
@@ -167,10 +171,8 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
 
         // Populate details
         tvTitle.setText(event.getTitle());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
-
-        tvStartTime.setText(dateFormat.format(event.getStartDate()));
-        tvEndTime.setText(dateFormat.format(event.getEndDate()));
+        tvStartTime.setText(displayFormat.format(event.getStartDate()));
+        tvEndTime.setText(displayFormat.format(event.getEndDate()));
         tvDescription.setText(event.getDescription());
 
         // Create and show the dialog
@@ -213,8 +215,6 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
                     dialogView.setLayoutParams(params); // Apply the new layout params
                 }
             }
-            // Apply expanding animation
-            applyExpandAnimation(dialogView);
         });
 
         dialog.show();
@@ -236,21 +236,6 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         parent.editEvent(this.event,event);
     }
 
-    private void applyExpandAnimation(View dialogView) {
-        // Set initial scale and alpha values
-        dialogView.setScaleX(0.8f);
-        dialogView.setScaleY(0.8f);
-        dialogView.setAlpha(0f);
-
-        // Animate the scale and alpha properties
-        dialogView.animate()
-                .scaleX(1.0f)
-                .scaleY(1.0f)
-                .alpha(1.0f)
-                .setDuration(400) // Animation duration
-                .setInterpolator(new android.view.animation.DecelerateInterpolator()) // Smooth easing
-                .start();
-    }
 
     private void adjustTextSize(int eventHeight) {
         if (eventHeight < 60) {
@@ -267,66 +252,66 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         return title;
     }
 
+    // Initialize event layout for overlapping UI scenarios using constraint positioning
     public void initOrganizedEvent(DayComponent.UIDayEvent uiDayEvent) {
         this.event = uiDayEvent.event;
+        setColorStyle(event);
 
-        initEventStyle(event);
 
-        // TODO: fix flickering. find alternative for waiting for the parent to be measured.
-
-        // Delay the layout until the parent is measured
-        post(new Runnable() {
+        // Wait until the parent layout has been measured
+        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void run() {
+            public void onGlobalLayout() {
+                // Remove the listener to prevent multiple calls
+                getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 setOrganizedEventLayout(uiDayEvent);
             }
         });
-
     }
 
     private void setOrganizedEventLayout(final DayComponent.UIDayEvent uiDayEvent) {
-        if (getParent() instanceof ConstraintLayout) {
-            ConstraintLayout parentLayout = (ConstraintLayout) getParent();
-            ConstraintSet constraintSet = new ConstraintSet();
+        if (!(getParent() instanceof ConstraintLayout)) return;
+        ConstraintLayout parentLayout = (ConstraintLayout) getParent();
+        ConstraintSet constraintSet = new ConstraintSet();
 
-            // *Important* All children in 'parentLayout' must have an ID
-            // We have already ensured in `ensureId()` that *this* view has a valid ID.
-            // Also ensure any other children also have IDs if you add them.
+        // *Important* All children in 'parentLayout' must have an ID
+        // We have already ensured in `ensureId()` that *this* view has a valid ID.
+        // Also ensure any other children also have IDs if you add them.
 
-            // Clone the layout so we can apply constraints
-            constraintSet.clone(parentLayout);
+        // Clone the layout so we can apply constraints
+        constraintSet.clone(parentLayout);
 
-            int viewId = getId();
+        int viewId = getId();
 
-            // Get parent's final measured dimensions (should be ~4800 px tall)
-            int parentWidth = parentLayout.getWidth();
-            int parentHeight = parentLayout.getHeight();
+        // Get parent's final measured dimensions (should be ~4800 px tall)
+        int parentWidth = parentLayout.getWidth();
+        int parentHeight = parentLayout.getHeight();
 
-            // Convert the 4 float percentages into absolute px
-            int topPx    = (int) (uiDayEvent.topMarginWeight    * parentHeight);
-            int heightPx = (int) (uiDayEvent.heightWeight       * parentHeight);
-            int leftPx   = (int) (uiDayEvent.leftMarginWeight   * parentWidth);
-            int widthPx = (int) (uiDayEvent.widthWeight * parentWidth) ;
+        // Convert the 4 float percentages into absolute px
+        int topPx    = (int) (uiDayEvent.topMarginWeight    * parentHeight);
+        int heightPx = (int) (uiDayEvent.heightWeight       * parentHeight);
+        int leftPx   = (int) (uiDayEvent.leftMarginWeight   * parentWidth);
+        int widthPx = (int) (uiDayEvent.widthWeight * parentWidth) ;
 
-            // Create LayoutParams
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(0, heightPx);
-            setLayoutParams(params);
+        // Create LayoutParams
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(0, heightPx);
+        setLayoutParams(params);
 
-            // Constrain the width as absolute
-            constraintSet.constrainWidth(viewId, widthPx);
+        // Constrain the width as absolute
+        constraintSet.constrainWidth(viewId, widthPx);
 
-            // Constrain the height as absolute
-            constraintSet.constrainHeight(viewId, heightPx);
+        // Constrain the height as absolute
+        constraintSet.constrainHeight(viewId, heightPx);
 
-            // Connect
-            constraintSet.connect(viewId, ConstraintSet.LEFT,
-                    ConstraintSet.PARENT_ID, ConstraintSet.LEFT, leftPx);
-            constraintSet.connect(viewId, ConstraintSet.TOP,
-                    ConstraintSet.PARENT_ID, ConstraintSet.TOP,   topPx);
+        // Connect
+        constraintSet.connect(viewId, ConstraintSet.LEFT,
+                ConstraintSet.PARENT_ID, ConstraintSet.LEFT, leftPx);
+        constraintSet.connect(viewId, ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID, ConstraintSet.TOP,   topPx);
 
-            // Apply
-            constraintSet.applyTo(parentLayout);
-        }
+        // Apply
+        constraintSet.applyTo(parentLayout);
+
     }
 
 }
