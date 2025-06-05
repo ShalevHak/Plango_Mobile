@@ -36,7 +36,9 @@ public class Group {
     public static final String[] visibilityOptions = {"Private", "Public", "Protected"};
     public static final String[] Roles = {"owner","admin","member"};
 
-
+    public static final String MEMBER = Roles[2];
+    public static final String ADMIN = Roles[1];
+    public static final String OWNER = Roles[0];
     // Constructors
     public Group(String name) {
         this.name = name;

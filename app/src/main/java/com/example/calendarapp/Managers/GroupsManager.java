@@ -5,11 +5,12 @@ import android.util.Log;
 
 import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.Interfaces.Group;
-import com.example.calendarapp.API.Responses.GetGroupsResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class GroupsManager {
@@ -108,6 +109,34 @@ public class GroupsManager {
             future.completeExceptionally(e);
             return null;
         });
+        return future;
+    }
+
+    public CompletableFuture<Boolean> isUserGroupsAdmin(String groupId) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        API.api().usersService.getMe().thenAccept(
+                userResponse ->
+                {
+                    String email = userResponse.user.getEmail();
+                    API.api().groupsService.getGroupById(groupId).thenAccept(
+                            groupHandlerResponse ->
+                            {
+                                HashMap<String, String> members = groupHandlerResponse.data.getMembers();
+                                String userRole = members.getOrDefault(email, "");
+                                future.complete(Objects.equals(userRole, Group.OWNER) || Objects.equals(userRole, Group.ADMIN));
+                            }
+                    )
+                    .exceptionally(e -> {
+                        future.completeExceptionally(e);
+                        return null;
+                    });
+                })
+                .exceptionally(
+                        e -> {
+                            future.completeExceptionally(e);
+                            return null;
+                        }
+                );
         return future;
     }
 }

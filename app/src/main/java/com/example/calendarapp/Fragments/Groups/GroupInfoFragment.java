@@ -1,5 +1,6 @@
 package com.example.calendarapp.Fragments.Groups;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +12,10 @@ import android.widget.*;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.Interfaces.Group;
 import com.example.calendarapp.Activities.ContentActivity;
 import com.example.calendarapp.Activities.CreateGroupActivity;
@@ -33,6 +36,7 @@ public class GroupInfoFragment extends Fragment{
 
     private static final String ARG_GROUP = "arg_group";   // <-- key for Bundle
     private Group group;
+    private GroupsManager groupsManager = GroupsManager.getInstance();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,18 +81,81 @@ public class GroupInfoFragment extends Fragment{
             createLeaveGroupDialog();
         });
 
+        configureEditOptionForMembers();
+
+
+
+        refreshMembersUI();
+    }
+
+    private void configureEditOptionForMembers() {
+        String groupId = group.getId();
+        groupsManager
+                .isUserGroupsAdmin(groupId)
+                .thenAccept(this::applyEditButtonState)
+                .exceptionally(this::onAdminCheckFailed);
+    }
+
+    /**
+     * Callback when we successfully determine whether the current user is an admin.
+     */
+    private void applyEditButtonState(boolean isAdmin) {
+        if (isAdmin) {
+            // Fully opaque and normal text/icon
+            btnEditGroup.setAlpha(1f);
+            btnEditGroup.setText("Edit Group");
+            btnEditGroup.setClickable(true);
+            btnEditGroup.setLongClickable(false);
+            TooltipCompat.setTooltipText(btnEditGroup, null);
+
+            setBtnEditGroupListener();
+        } else {
+            // Visually grey it out
+            btnEditGroup.setAlpha(0.5f);
+            // Optionally append a hint so users see why it's disabled
+            btnEditGroup.setText("Edit Group (Admins Only)");
+            btnEditGroup.setClickable(false);
+            // Allow long-press so the tooltip shows
+            btnEditGroup.setLongClickable(true);
+            // Show a tooltip on long-press / hover
+            TooltipCompat.setTooltipText(btnEditGroup, "Only admins can edit group settings");
+
+            // Optionally: if you want to catch a tap and show a quick Toast instead of doing nothing:
+            btnEditGroup.setOnClickListener(v ->
+                    Toast.makeText(v.getContext(), "Only admins can edit group settings", Toast.LENGTH_SHORT).show()
+            );
+        }
+    }
+
+    /**
+     * Error handler if the CompletableFuture chain fails.
+     * Logs the exception, disables the button, and shows a generic tooltip.
+     */
+    private Void onAdminCheckFailed(Throwable throwable) {
+        Log.e("GroupInfoFragment", "Failed to check admin status for group " + group.getId(), throwable);
+
+        // Disable + grey-out + show generic tooltip
+        btnEditGroup.setAlpha(0.5f);
+        btnEditGroup.setClickable(false);
+        btnEditGroup.setLongClickable(true);
+        btnEditGroup.setText("Edit Group (Error)");
+        TooltipCompat.setTooltipText(btnEditGroup, "Error determining permissions");
+
+        btnEditGroup.setOnClickListener(v ->
+                Toast.makeText(v.getContext(), "Error determining permissions", Toast.LENGTH_SHORT).show()
+        );
+
+        return null;
+    }
+
+    public void setBtnEditGroupListener() {
         btnEditGroup.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), CreateGroupActivity.class);
             intent.putExtra("groupId", group.getId());
             intent.putExtra("source_activity", "GroupActivity");
             startActivity(intent);
-
         });
-
-        refreshMembersUI();
     }
-
-
 
     private void refreshMembersUI() {
         layoutSelectedMembers.removeAllViews();
@@ -127,7 +194,7 @@ public class GroupInfoFragment extends Fragment{
                 .setTitle("Leave Group")
                 .setMessage("Are you sure you want to leave the group \"" + group.getName() + "\"?")
                 .setPositiveButton("Leave", (dialog, which) -> {
-                    GroupsManager.getInstance().leaveGroup(group)
+                    groupsManager.leaveGroup(group)
                         .thenAccept(res -> {
                             Toast.makeText(getContext(), "You left the group", Toast.LENGTH_SHORT).show();
                             // Navigate back
