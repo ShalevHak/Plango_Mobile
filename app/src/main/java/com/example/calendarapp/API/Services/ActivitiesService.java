@@ -7,6 +7,7 @@ import com.example.calendarapp.API.FetchingHelpers.ActivitiesHelper;
 import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.API.Responses.EventHandlerResponse;
 import com.example.calendarapp.API.Responses.EventsResponse;
+import com.example.calendarapp.Components.Calendars.DayCalendarComponent2;
 import com.example.calendarapp.Components.Calendars.EventEditComponent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -60,6 +61,11 @@ public class ActivitiesService extends AbstractAPIService<ActivitiesHelper>{
     public CompletableFuture<List<Event>> getEventsByDate(String calendarID, Date date) {
         CompletableFuture<List<Event>> future = new CompletableFuture<>();
 
+        if (calendarID.equals(DayCalendarComponent2.NONE)){
+            future.completeExceptionally(new Exception("No calendar found."));
+            return future;
+        }
+
         String formattedDate = apiDateFormat.format(date); // Format date properly
         Call<EventsResponse> call = fetchingHelper.getEventsByDate(calendarID,formattedDate);
 
@@ -85,8 +91,13 @@ public class ActivitiesService extends AbstractAPIService<ActivitiesHelper>{
     }
     public CompletableFuture<Event> addEvent(String calendarID, Event event) {
         CompletableFuture<Event> future = new CompletableFuture<>();
-        Call<EventHandlerResponse> call = fetchingHelper.createEvent(calendarID,event);
 
+        if (calendarID.equals(DayCalendarComponent2.NONE)){
+            future.completeExceptionally(new Exception("No calendar found."));
+            return future;
+        }
+
+        Call<EventHandlerResponse> call = fetchingHelper.createEvent(calendarID,event);
         call.enqueue(new Callback<EventHandlerResponse>() {
             @Override
             public void onResponse(Call<EventHandlerResponse> call, Response<EventHandlerResponse> response) {
@@ -109,6 +120,12 @@ public class ActivitiesService extends AbstractAPIService<ActivitiesHelper>{
     }
     public CompletableFuture<Event> updateEvent(String calendarID, String eventID,Event event) {
         CompletableFuture<Event> future = new CompletableFuture<>();
+
+        if (calendarID.equals(DayCalendarComponent2.NONE)){
+            future.completeExceptionally(new Exception("No calendar found."));
+            return future;
+        }
+
         Call<EventHandlerResponse> call = fetchingHelper.updateEvent(calendarID,eventID,event);
 
         call.enqueue(new Callback<EventHandlerResponse>() {

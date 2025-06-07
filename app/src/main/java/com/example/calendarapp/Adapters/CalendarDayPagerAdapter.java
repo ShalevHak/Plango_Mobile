@@ -17,7 +17,6 @@ public class CalendarDayPagerAdapter extends RecyclerView.Adapter<CalendarDayPag
     private Context parentContext;
     private String calendarId;
     public CalendarDayPagerAdapter(String calendarId) {
-
         calendarsManager = CalendarsManager.getInstance();
         this.calendarId = calendarId;
     }

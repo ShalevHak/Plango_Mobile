@@ -25,6 +25,7 @@ import com.example.calendarapp.API.Interfaces.Event;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
 import com.example.calendarapp.Managers.CalendarsManager;
+import com.example.calendarapp.Utils.ErrorUtils;
 import com.example.calendarapp.Utils.ThemeUtils;
 import com.example.calendarapp.Utils.TimeUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -471,6 +472,7 @@ public class DayComponent extends LinearLayout implements IComponent {
         svDay.scrollTo(0, 0);
     }
     private void addNewEvent(Event event) {
+        if(calendarId == null) return;
         calendarsManager.addEvent(event, calendarId)
                 .thenAccept(e ->{
                     clearEvents();
@@ -478,7 +480,7 @@ public class DayComponent extends LinearLayout implements IComponent {
                 })
                 .exceptionally(
                 e -> {
-                    String msg = "Unable to add event: \n" + e.getMessage();
+                    String msg = "Unable to add event: \n" + ErrorUtils.getCause(e); // TODO: e msg removal
                     Log.e("DayComponent",msg);
                     Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
                     return null;
@@ -486,6 +488,7 @@ public class DayComponent extends LinearLayout implements IComponent {
     }
 
     public void editEvent(Event originalEvent, Event editedEvent) {
+        if(calendarId == null) return;
         calendarsManager.updateEvent(originalEvent, editedEvent, calendarId)
                 .thenAccept(e ->{
                     Log.i("DayComponent","Event Update Succeeded");
@@ -494,7 +497,7 @@ public class DayComponent extends LinearLayout implements IComponent {
                 })
                 .exceptionally(
                 e -> {
-                    String msg = "Unable to update event: \n" + e.getMessage();
+                    String msg = "Unable to update event: \n" +  ErrorUtils.getCause(e);  // TODO: e msg removal
                     Log.e("DayComponent",msg);
                     Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
                     return null;
@@ -502,8 +505,9 @@ public class DayComponent extends LinearLayout implements IComponent {
     }
 
     public void displayEvents(){
-        calendarsManager.GetCurrentDayEvent().thenAccept(this::addEvents).exceptionally(e -> {
-            String msg = "Unable to load events: \n" + e.getMessage();
+        if(calendarId == null) return;
+        calendarsManager.GetCurrentDayEvent(calendarId).thenAccept(this::addEvents).exceptionally(e -> {
+            String msg = "Unable to load events: \n" + ErrorUtils.getCause(e); //TODO: remove error msgs from toasts to user.
             Log.e("DayComponent",msg);
             Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
             return null;

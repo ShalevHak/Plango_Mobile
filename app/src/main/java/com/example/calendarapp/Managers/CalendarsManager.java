@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.Interfaces.Event;
+import com.example.calendarapp.Adapters.CalendarDayPagerAdapter;
+import com.example.calendarapp.Components.Calendars.DayCalendarComponent2;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -51,10 +53,9 @@ public class CalendarsManager {
         });
         return future;
     }
-    public CompletableFuture<List<Event>> GetCurrentDayEvent() {
+    public CompletableFuture<List<Event>> GetCurrentDayEvent(String calendarId) {
         Date today = GetCurrentDay();
-        return getMyScheduleId()
-                .thenCompose(scheduleId -> API.api().activitiesService.getEventsByDate(scheduleId, today));
+        return API.api().activitiesService.getEventsByDate(calendarId, today);
     }
 
     public CompletableFuture<Event> addEvent(Event event, String calendarId) {

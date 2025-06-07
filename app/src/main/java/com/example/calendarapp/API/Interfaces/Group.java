@@ -1,18 +1,9 @@
 package com.example.calendarapp.API.Interfaces;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import androidx.annotation.NonNull;
-
 import com.google.gson.annotations.SerializedName;
 
-import java.lang.reflect.Member;
 import java.util.HashMap;
+import java.util.List;
 
 public class Group {
     @SerializedName("_id")
@@ -22,6 +13,7 @@ public class Group {
     private String name;
     @SerializedName("color")
     private String color;
+
     @SerializedName("about")
     private String about;
     @SerializedName("visibility")
@@ -30,7 +22,8 @@ public class Group {
     // Map Emails to Roles
     @SerializedName("members")
     private HashMap<String,String> members;
-
+    @SerializedName("calendars")
+    private List<ApiCalendar> calendars; //Virtual in Mongo
 
     // TODO: move to correct interfaces: IIdentifiers, IProfileCard, IMembers, IVisibility
     public static final String[] visibilityOptions = {"Private", "Public", "Protected"};
@@ -67,40 +60,21 @@ public class Group {
         this.members = group.getMembers();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getColor() {
         return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
     }
 
     public String getAbout() {
         return about;
     }
 
-    public void setAbout(String about) {
-        this.about = about;
-    }
-
     public String getVisibility() {
         return visibility;
     }
 
-    public void setVisibility(String visibility) {
-        this.visibility = visibility;
-    }
-
     public HashMap<String, String> getMembers() {
         return members;
-    }
-
-    public void setMembers(HashMap<String, String> members) {
-        this.members = members;
     }
 
 
@@ -108,11 +82,12 @@ public class Group {
         return name;
     }
 
-
-
-
     public String getId() {
         return id;
+    }
+
+    public List<ApiCalendar> getCalendars() {
+        return calendars;
     }
 
     public void removeMember(String email){

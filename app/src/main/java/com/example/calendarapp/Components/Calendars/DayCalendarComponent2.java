@@ -2,6 +2,7 @@ package com.example.calendarapp.Components.Calendars;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class DayCalendarComponent2 extends LinearLayout implements IComponent {
+    public static final String NONE = "NONE";
     private  String calendarId = null;
     private TextView tvDayOfMonth, tvMonth, tvYear;
     private ViewPager2 viewPager;
@@ -28,8 +30,8 @@ public class DayCalendarComponent2 extends LinearLayout implements IComponent {
     private CalendarDayPagerAdapter adapter;
     public DayCalendarComponent2(Context context, String calendarId) {
         super(context);
-        initComponent(context);
         this.calendarId = calendarId;
+        initComponent(context);
     }
 
     public DayCalendarComponent2(Context context, @Nullable AttributeSet attrs) {
@@ -62,22 +64,22 @@ public class DayCalendarComponent2 extends LinearLayout implements IComponent {
         pagerPos = 0;
 
         if (calendarId == null) {
-            calendarsManager.getMyScheduleId().thenAccept(this::initViewPager).exceptionally(e ->{
+            calendarsManager.getMyScheduleId().thenAccept(
+                    id -> {
+                        calendarId = id;
+                        initViewPager();
+                    }
+            ).exceptionally(e ->{
                 Toast.makeText(context, "Could not find user's schedule", Toast.LENGTH_SHORT).show();
                 return null;
             });
         }
-
-        initViewPager(calendarId);
-        // Link TabLayout with ViewPager2
-//        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd");
-//            tab.setText(dateFormat.format(currentCalendar.getTime()));
-//        }).attach();
+        initViewPager();
     }
 
-    private void initViewPager(String _calendarId) {
-        adapter = new CalendarDayPagerAdapter(_calendarId);
+    private void initViewPager() {
+        Log.i("DayCalendarComponent2","Started init ViewPager for calendar with id: " + calendarId);
+        adapter = new CalendarDayPagerAdapter(calendarId);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);
         updateDateTitle();
