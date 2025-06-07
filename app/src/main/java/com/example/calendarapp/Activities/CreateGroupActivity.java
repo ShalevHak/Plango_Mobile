@@ -27,6 +27,7 @@ import com.example.calendarapp.API.Interfaces.Group;
 import com.example.calendarapp.Managers.GroupsManager;
 import com.example.calendarapp.Managers.UsersManager;
 import com.example.calendarapp.R;
+import com.example.calendarapp.Utils.ErrorUtils;
 import com.example.calendarapp.Utils.NetworkUtil;
 import com.example.calendarapp.Utils.ThemeUtils;
 
@@ -223,7 +224,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                     .thenRun(this::goBackToSourceActivity)
                     .exceptionally(e -> {
                         Toast.makeText(this,"Could not create group",Toast.LENGTH_LONG).show();
-                        Log.e("CreateGroupActivity", "Could not create group: " + e.getMessage());
+                        Log.e("CreateGroupActivity", "Could not create group: " + ErrorUtils.getCause(e));
                         return null;
                     });
         }
