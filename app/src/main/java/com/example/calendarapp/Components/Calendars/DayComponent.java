@@ -28,6 +28,7 @@ import com.example.calendarapp.Managers.CalendarsManager;
 import com.example.calendarapp.Utils.ErrorUtils;
 import com.example.calendarapp.Utils.ThemeUtils;
 import com.example.calendarapp.Utils.TimeUtils;
+import com.example.calendarapp.Notifications.NotificationUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -475,6 +476,7 @@ public class DayComponent extends LinearLayout implements IComponent {
         if(calendarId == null) return;
         calendarsManager.addEvent(event, calendarId)
                 .thenAccept(e ->{
+                    NotificationUtils.scheduleEventReminder(getContext(), event);
                     clearEvents();
                     displayEvents();
                 })
