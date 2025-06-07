@@ -333,15 +333,19 @@ public class DayComponent extends LinearLayout implements IComponent {
         };
 
         // > Calculate the weight of each event based on the max overlaps it has in a single row
+        final int MAX_COLUMNS = 3;
         Map<Event, Float> widthWeights = events.stream()
                 .collect(Collectors.toMap(
                         event -> event,
                         event -> {
                             // Use getRowsRange to get the max value in rowsOverlaps between startRow and endRow (inclusive)
-                            return 1f /getRowsRange.apply(event)
+                            int maxOverlap = getRowsRange.apply(event)
                                     .map(row -> rowsOverlaps[row])
                                     .max()
                                     .orElse(1);
+                            // Clamp overlaps to the allowed number of columns so that
+                            // widths never become smaller than a third of the screen.
+                            return 1f / Math.min(maxOverlap, MAX_COLUMNS);
                         }
                 ));
 
@@ -441,7 +445,6 @@ public class DayComponent extends LinearLayout implements IComponent {
 //    }
 
     private void  addUIDayEventBlock(UIDayEvent event){
-        //TODO: deal with extras!
         if(event.isExtra)return;
         EventComponent2 eventComponent = new EventComponent2(getContext());
         eventComponent.initOrganizedEvent(event);
@@ -480,7 +483,7 @@ public class DayComponent extends LinearLayout implements IComponent {
                 })
                 .exceptionally(
                 e -> {
-                    String msg = "Unable to add event: \n" + ErrorUtils.getCause(e); // TODO: e msg removal
+                    String msg = "Unable to add event: \n" + ErrorUtils.getCause(e);
                     Log.e("DayComponent",msg);
                     Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
                     return null;
@@ -497,7 +500,7 @@ public class DayComponent extends LinearLayout implements IComponent {
                 })
                 .exceptionally(
                 e -> {
-                    String msg = "Unable to update event: \n" +  ErrorUtils.getCause(e);  // TODO: e msg removal
+                    String msg = "Unable to update event: \n" +  ErrorUtils.getCause(e);
                     Log.e("DayComponent",msg);
                     Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
                     return null;
@@ -507,7 +510,7 @@ public class DayComponent extends LinearLayout implements IComponent {
     public void displayEvents(){
         if(calendarId == null) return;
         calendarsManager.GetCurrentDayEvent(calendarId).thenAccept(this::addEvents).exceptionally(e -> {
-            String msg = "Unable to load events: \n" + ErrorUtils.getCause(e); //TODO: remove error msgs from toasts to user.
+            String msg = "Unable to load events: \n" + ErrorUtils.getCause(e);
             Log.e("DayComponent",msg);
             Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
             return null;

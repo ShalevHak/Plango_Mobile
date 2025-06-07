@@ -171,6 +171,15 @@ public class EventEditComponent extends LinearLayout implements IComponent {
 
         if (!ok) return false;
 
+        final long TEN_MINUTES_IN_MILLIS = 10 * 60 * 1000;
+        long duration = endCal.getTimeInMillis() - startCal.getTimeInMillis();
+
+        if (duration < TEN_MINUTES_IN_MILLIS) {
+            tilEndTime.setError("Event's duration must be at least 10 minutes");
+            return false;
+        }
+
+
         if (endCal.before(startCal)) {
             tilEndTime.setError("End before start");
             return false;
