@@ -2,9 +2,15 @@
 
 **Plango** is an advanced calendar and scheduling app designed specifically for businesses and service providers. It offers an intuitive and efficient scheduling experience, with features tailored for team coordination, appointments, service bookings, and much more. 
 
+### Collaboration with NavehBrenner
+
+This project is developed in collaboration with [NavehBrenner](https://github.com/NavehBrenner/). While I focus on the mobile application, Naveh has developed the [web application](https://github.com/NavehBrenner/calendar-webapp). We also worked together on developing the [MongoDB backend API](https://github.com/NavehBrenner/Bussiness-Calendar-App). Together, we aspire to create a comprehensive scheduling solution that spans both mobile and web platforms.
+
+![Plango Logo](assets/logo_v2.png)
 ### Currently in Development 🚧
 
-Plango is actively being developed. Currently, the app is in early stages of development, and while it is functional for basic scheduling needs, As a solo developer, I'm continuously enhancing and expanding its functionality to deliver a robust and advanced scheduling solution for businesses and service providers.
+Plango Mobile is actively being developed. Currently, the app is in early stages of development, and while it is functional for basic scheduling needs, I'm continuously enhancing and expanding its functionality to deliver a robust and advanced scheduling solution for businesses and service providers.
+
 
 ## Features (Planned for Final Release) 🚀
 
