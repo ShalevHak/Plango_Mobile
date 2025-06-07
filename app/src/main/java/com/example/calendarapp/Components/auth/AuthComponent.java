@@ -21,6 +21,7 @@ import com.example.calendarapp.API.Services.UsersService;
 import com.example.calendarapp.Activities.ContentActivity;
 import com.example.calendarapp.Components.Interfaces.IComponent;
 import com.example.calendarapp.R;
+import com.example.calendarapp.Utils.ErrorUtils;
 
 public class AuthComponent extends LinearLayout implements IComponent {
     private boolean isSignIn = true; // Default to Sign-In
@@ -141,7 +142,7 @@ public class AuthComponent extends LinearLayout implements IComponent {
                 setClickableButtons(true);
                 new AlertDialog.Builder(getContext())
                         .setTitle("Log In Error")
-                        .setMessage(e.getMessage())
+                        .setMessage(ErrorUtils.getCause(e))
                         .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                         .show();
                 return null;
@@ -176,7 +177,7 @@ public class AuthComponent extends LinearLayout implements IComponent {
                     setClickableButtons(true);
                     new AlertDialog.Builder(getContext())
                             .setTitle("Sign Up Error")
-                            .setMessage(e.getMessage())
+                            .setMessage(ErrorUtils.getCause(e))
                             .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                             .show();
                     return null;
