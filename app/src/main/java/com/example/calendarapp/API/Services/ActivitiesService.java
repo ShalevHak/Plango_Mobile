@@ -46,11 +46,11 @@ public class ActivitiesService extends AbstractAPIService<ActivitiesHelper>{
                 .build();
     }
 
-    private static final SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private static final SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault());
 
     private Date parseDate(String dateString) {
         try {
-            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
             return dateTimeFormat.parse(dateString);
         } catch (Exception e) {
             e.printStackTrace();
