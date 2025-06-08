@@ -10,16 +10,18 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 
 import com.example.calendarapp.Activities.CreateGroupActivity;
+import com.example.calendarapp.Components.Groups.GroupsRecycler;
 import com.example.calendarapp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class GroupsFragment extends Fragment {
     private FloatingActionButton fabGroupsAction;
+    private GroupsRecycler groupsRecycler;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
-;
+        groupsRecycler = view.findViewById(R.id.groupsRecycler);
         fabGroupsAction = view.findViewById(R.id.fabGroupsAction);
 
         fabGroupsAction.setOnClickListener(v -> showGroupActionDialog());
@@ -45,5 +47,12 @@ public class GroupsFragment extends Fragment {
                     }
                 })
                 .show();
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(groupsRecycler != null){
+            groupsRecycler.refresh();
+        }
     }
 }

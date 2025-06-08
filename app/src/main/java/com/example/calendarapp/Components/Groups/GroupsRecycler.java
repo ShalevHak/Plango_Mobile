@@ -31,11 +31,13 @@ public class GroupsRecycler extends RecyclerView implements IComponent {
 
     @Override
     public void initComponent(Context context) {
-        String tag = this.getTag().toString();
-        if(tag.equals("self"))
-        {
-            this.setLayoutManager(new LinearLayoutManager(context));
-            this.setAdapter(new GroupsRecyclerAdapter(TokenManager.getInstance().getUserID()));
+        this.setLayoutManager(new LinearLayoutManager(context));
+        this.setAdapter(new GroupsRecyclerAdapter());
+    }
+
+    public void refresh(){
+        if(getAdapter() != null && getAdapter() instanceof GroupsRecyclerAdapter){
+            ((GroupsRecyclerAdapter) getAdapter()).refresh();
         }
     }
 }

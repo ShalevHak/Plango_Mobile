@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.calendarapp.API.Interfaces.Group;
+import com.example.calendarapp.API.TokenManagement.TokenManager;
 import com.example.calendarapp.Components.Calendars.DayComponent;
 import com.example.calendarapp.Components.Groups.GroupItemComponent;
 import com.example.calendarapp.Managers.GroupsManager;
@@ -21,8 +22,11 @@ public class GroupsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private static final int VIEW_TYPE_EMPTY = 0;
     private static final int VIEW_TYPE_GROUP = 1;
     private List<Group> groups = new ArrayList<>();
-    public GroupsRecyclerAdapter(String userId){
-        GroupsManager.getInstance().loadGroupsForUser(userId).thenAccept(loadedGroups -> {
+    public GroupsRecyclerAdapter(){
+        loadGroups();
+    }
+    private void loadGroups(){
+        GroupsManager.getInstance().loadGroupsForUser(TokenManager.getInstance().getUserID()).thenAccept(loadedGroups -> {
             Log.i("GroupsAdapter", "Loaded groups: " + loadedGroups.size());
             groups.clear();
             groups.addAll(loadedGroups);
@@ -30,6 +34,9 @@ public class GroupsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         });
     }
 
+    public void refresh(){
+        loadGroups();
+    }
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
