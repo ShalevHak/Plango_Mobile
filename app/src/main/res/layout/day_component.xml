@@ -16,6 +16,19 @@
             android:visibility="gone"
             android:backgroundTint="?attr/colorBackgroundSecondary"
             android:textColor="?attr/colorPrimaryText" />
+
+        <!-- Header label for all day events -->
+        <TextView
+            android:id="@+id/tvFullDayHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:text="Full-Day Events"
+            android:textColor="?attr/colorPrimaryText"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+
         <!-- Full-Day Events Scrollable Row -->
         <HorizontalScrollView
             android:id="@+id/hsvFullDayEvents"
@@ -31,6 +44,13 @@
                 android:orientation="horizontal"
                 android:padding="8dp"/>
         </HorizontalScrollView>
+        <!-- Divider between full-day events and timed events -->
+        <View
+            android:id="@+id/dividerFullDay"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/colorPrimaryText"
+            android:visibility="gone" />
         <ScrollView
             android:id="@+id/svDay"
             android:layout_width="match_parent"

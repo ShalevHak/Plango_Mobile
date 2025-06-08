@@ -35,9 +35,11 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -48,6 +50,8 @@ public class DayComponent extends LinearLayout implements IComponent {
 
     private ConstraintLayout eventContainer;
     private ScrollView svDay;
+    private TextView tvFullDayHeader;
+    private View dividerFullDay;
     private HorizontalScrollView hsvFullDayEvents;
     private CalendarsManager calendarsManager;
     private FloatingActionButton fabAddEvent;
@@ -85,12 +89,15 @@ public class DayComponent extends LinearLayout implements IComponent {
         eventContainer         = findViewById(R.id.clEventContainer);
         svDay                  = findViewById(R.id.svDay);
         hsvFullDayEvents       = findViewById(R.id.hsvFullDayEvents);
+        tvFullDayHeader        = findViewById(R.id.tvFullDayHeader);
+        dividerFullDay         = findViewById(R.id.dividerFullDay);
         fullDayEventContainer  = findViewById(R.id.llFullDayEvents);
         fabAddEvent            = findViewById(R.id.fabAddEvent);
         btnExtras              = findViewById(R.id.btnExtras);
 
         btnExtras.setVisibility(GONE); // start hidden
-
+        tvFullDayHeader.setVisibility(GONE);
+        dividerFullDay.setVisibility(GONE);
 
         // Click Listener for Adding Events
         fabAddEvent.setOnClickListener(view -> {
@@ -168,24 +175,33 @@ public class DayComponent extends LinearLayout implements IComponent {
     }
 
     public void addEvents(List<Event> events) {
-        if (overflowDialog != null && overflowDialog.isShowing()) {
-            overflowDialog.dismiss();
-            overflowDialog = null;
-        }
-        btnExtras.setVisibility(GONE);
+
         if (events == null || events.isEmpty()) return;
 
-        // 1) Separate full-day events from time-based events
+        // 1) Separate full-day events from time-based events, avoiding duplicates
         List<Event> fullDay = new ArrayList<>();
         List<Event> timed   = new ArrayList<>();
+
+        Set<String> seenFullDayIds = new HashSet<>();
         for (Event e : events) {
-            if (e.isFullDay()) fullDay.add(e);
-            else               timed.add(e);
+            if (e.isFullDay()) {
+                if (e.getId() == null || !seenFullDayIds.contains(e.getId())) {
+                    fullDay.add(e);
+                    if (e.getId() != null) seenFullDayIds.add(e.getId());
+                }
+            } else {
+                timed.add(e);
+            }
         }
 
-        // 2) Add full-day events to the horizontal container
-        for (Event fdEvent : fullDay) {
-            addFullDayEventBlock(fdEvent);
+        // 2) Add full-day events to the horizontal container and toggle header
+        if (!fullDay.isEmpty()) {
+            tvFullDayHeader.setVisibility(VISIBLE);
+            hsvFullDayEvents.setVisibility(VISIBLE);
+            dividerFullDay.setVisibility(VISIBLE);
+            for (Event fdEvent : fullDay) {
+                addFullDayEventBlock(fdEvent);
+            }
         }
 
         // 3) Organize normal events into UIDayEvents
@@ -467,8 +483,16 @@ public class DayComponent extends LinearLayout implements IComponent {
 
 
     public void clearEvents() {
-        eventContainer.removeAllViews();
-        fullDayEventContainer.removeAllViews();
+        if (eventContainer != null) eventContainer.removeAllViews();
+        if (fullDayEventContainer != null) fullDayEventContainer.removeAllViews();
+        if (overflowDialog != null && overflowDialog.isShowing()) {
+            overflowDialog.dismiss();
+            overflowDialog = null;
+        }
+        btnExtras.setVisibility(GONE);
+        tvFullDayHeader.setVisibility(GONE);
+        hsvFullDayEvents.setVisibility(GONE);
+        dividerFullDay.setVisibility(GONE);
     }
 
     public void resetScroller() {
@@ -476,9 +500,9 @@ public class DayComponent extends LinearLayout implements IComponent {
     }
     private void addNewEvent(Event event) {
         if(calendarId == null) return;
+        clearEvents();
         calendarsManager.addEvent(event, calendarId)
                 .thenAccept(e ->{
-                    clearEvents();
                     displayEvents();
                 })
                 .exceptionally(
@@ -492,10 +516,10 @@ public class DayComponent extends LinearLayout implements IComponent {
 
     public void editEvent(Event originalEvent, Event editedEvent) {
         if(calendarId == null) return;
+        clearEvents();
         calendarsManager.updateEvent(originalEvent, editedEvent, calendarId)
                 .thenAccept(e ->{
                     Log.i("DayComponent","Event Update Succeeded");
-                    clearEvents();
                     displayEvents();
                 })
                 .exceptionally(
@@ -509,10 +533,10 @@ public class DayComponent extends LinearLayout implements IComponent {
 
     public void deleteEvent(Event event){
         if(calendarId == null) return;
+        clearEvents();
         calendarsManager.deleteEvent(event,calendarId)
                 .thenRun(() -> {
                     Log.i("DayComponent","Event Update Succeeded");
-                    clearEvents();
                     displayEvents();
                 })
                 .exceptionally(
