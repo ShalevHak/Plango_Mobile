@@ -65,5 +65,7 @@ public class CalendarsManager {
     public CompletableFuture<Event> updateEvent(Event originalEvent, Event editedEvent, String calendarId) {
         return API.api().activitiesService.updateEvent(calendarId,originalEvent.getId(),editedEvent);
     }
-
+    public CompletableFuture<Void> deleteEvent(Event event, String calendarId) {
+        return API.api().activitiesService.deleteEvent(calendarId,event.getId());
+    }
 }

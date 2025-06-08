@@ -1,10 +1,12 @@
 package com.example.calendarapp.Components.Calendars;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -146,68 +148,53 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
     }
     private void showEventDetailsDialog() {
         Context context = getContext();
-
-        // Create a Dialog
-        androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(context);
-
-        // Inflate a custom layout for the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         View dialogView = View.inflate(context, R.layout.dialog_event_details, null);
-
-        // Set the custom view for the dialog
         dialogBuilder.setView(dialogView);
 
-        // Access and populate dialog views
         TextView tvTitle = dialogView.findViewById(R.id.tvEventDialogTitle);
         TextView tvStartTime = dialogView.findViewById(R.id.tvEventDialogStartTime);
         TextView tvEndTime = dialogView.findViewById(R.id.tvEventDialogEndTime);
         TextView tvDescription = dialogView.findViewById(R.id.tvEventDialogDescription);
+
         View btnEdit = dialogView.findViewById(R.id.btnEditEvent);
+        View btnDelete = dialogView.findViewById(R.id.btnDeleteEvent);
         View btnClose = dialogView.findViewById(R.id.btnCloseEventDialog);
 
-        // Populate details
         tvTitle.setText(event.getTitle());
         tvStartTime.setText(displayFormat.format(event.getStartDate()));
         tvEndTime.setText(displayFormat.format(event.getEndDate()));
         tvDescription.setText(event.getDescription());
 
-        // Create and show the dialog
-        androidx.appcompat.app.AlertDialog dialog = dialogBuilder.create();
+        AlertDialog dialog = dialogBuilder.create();
 
-        // Set button actions
-        btnEdit.setOnClickListener(v -> {
-            openEditEventDialog(context, dialog);
+        btnEdit.setOnClickListener(v -> openEditEventDialog(context, dialog));
+
+        btnDelete.setOnClickListener(v -> {
+            new AlertDialog.Builder(context)
+                    .setTitle("Delete Event")
+                    .setMessage("Are you sure you want to delete this event?")
+                    .setPositiveButton("Delete", (dialogInterface, which) -> {
+                        deleteEvent(event); // Call the already implemented delete
+                        dialog.dismiss();   // Close the main dialog
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
+
         btnClose.setOnClickListener(v -> {
-            // Dismiss the dialog
             if (dialog != null) dialog.dismiss();
         });
 
-        // Make the dialog larger and with rounded corners
         dialog.setOnShowListener(d -> {
             if (dialog.getWindow() != null) {
-                // Get screen dimensions
                 int width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.9);
-                int height = (int) (context.getResources().getDisplayMetrics().heightPixels * 0.9);
-
-                // Set dialog dimensions
-                dialog.getWindow().setLayout(width, height);
+                dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
                 dialog.getWindow().setBackgroundDrawableResource(R.drawable.round_corner_background);
 
-                // Resolve the background color from the theme
-                int backgroundColor = ThemeUtils.resolveColorFromTheme(getContext(), R.attr.colorBackground);
-
-                // Tint the drawable with the resolved color
                 Drawable backgroundDrawable = dialog.getWindow().getDecorView().getBackground();
                 if (backgroundDrawable != null) {
-                    backgroundDrawable.setTint(backgroundColor);
-                }
-
-                // Resize the root view of the dialog (dialogView)
-                ViewGroup.LayoutParams params = dialogView.getLayoutParams();
-                if (params != null) {
-                    params.width = width;
-                    params.height = height;
-                    dialogView.setLayoutParams(params); // Apply the new layout params
+                    backgroundDrawable.setTint(ThemeUtils.resolveColorFromTheme(getContext(), R.attr.colorBackground));
                 }
             }
         });
@@ -215,7 +202,8 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         dialog.show();
     }
 
-    private void openEditEventDialog(Context context, androidx.appcompat.app.AlertDialog dialog) {
+
+    private void openEditEventDialog(Context context, AlertDialog dialog) {
         // Create a dialog for editing the event
         EventEditComponent.openEditEventDialog(
                 context,
@@ -231,6 +219,9 @@ public class EventComponent2 extends FrameLayout implements IComponent, View.OnC
         parent.editEvent(this.event,event);
     }
 
+    private void deleteEvent(Event event) {
+        parent.deleteEvent(event);
+    }
 
     private void adjustTextSize(int eventHeight) {
         if (eventHeight < 60) {

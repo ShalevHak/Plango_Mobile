@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.FetchingHelpers.ActivitiesHelper;
 import com.example.calendarapp.API.Interfaces.Event;
+import com.example.calendarapp.API.Responses.DefaultResponse;
 import com.example.calendarapp.API.Responses.EventHandlerResponse;
 import com.example.calendarapp.API.Responses.EventsResponse;
 import com.example.calendarapp.Components.Calendars.DayCalendarComponent2;
@@ -146,6 +147,34 @@ public class ActivitiesService extends AbstractAPIService<ActivitiesHelper>{
             }
         });
 
+        return future;
+    }
+
+    public CompletableFuture<Void> deleteEvent(String calendarID, String eventID) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        if (calendarID.equals(DayCalendarComponent2.NONE)) {
+            future.completeExceptionally(new Exception("No calendar found."));
+            return future;
+        }
+
+        Call<DefaultResponse> call = fetchingHelper.deleteEvent(calendarID, eventID);
+
+        call.enqueue(new Callback<DefaultResponse>() {
+            @Override
+            public void onResponse(Call<DefaultResponse> call, Response<DefaultResponse> response) {
+                if (response.isSuccessful()) {
+                    future.complete(null);
+                } else {
+                    future.completeExceptionally(new Exception(parseError(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DefaultResponse> call, Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
         return future;
     }
 }

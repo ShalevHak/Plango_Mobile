@@ -1,11 +1,13 @@
 package com.example.calendarapp.API.FetchingHelpers;
 
 import com.example.calendarapp.API.Interfaces.Event;
+import com.example.calendarapp.API.Responses.DefaultResponse;
 import com.example.calendarapp.API.Responses.EventHandlerResponse;
 import com.example.calendarapp.API.Responses.EventsResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -30,4 +32,7 @@ public interface ActivitiesHelper {
             @Path("eventId") String eventId,
             @Body Event event
     );
+    @DELETE("{calendarId}/events/{eventId}")
+    Call<DefaultResponse> deleteEvent(@Path("calendarId") String calendarId,
+                                      @Path("eventId") String eventId);
 }

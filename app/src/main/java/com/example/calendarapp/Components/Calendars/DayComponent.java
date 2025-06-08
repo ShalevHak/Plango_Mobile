@@ -507,6 +507,23 @@ public class DayComponent extends LinearLayout implements IComponent {
                 });
     }
 
+    public void deleteEvent(Event event){
+        if(calendarId == null) return;
+        calendarsManager.deleteEvent(event,calendarId)
+                .thenRun(() -> {
+                    Log.i("DayComponent","Event Update Succeeded");
+                    clearEvents();
+                    displayEvents();
+                })
+                .exceptionally(
+                        e -> {
+                            String msg = "Unable to delete event: \n" +  e.toString();
+                            Log.e("DayComponent",msg);
+                            Toast.makeText(getContext(), msg,Toast.LENGTH_LONG).show();
+                            return null;
+                        });
+    }
+
     public void displayEvents(){
         if(calendarId == null) return;
         calendarsManager.GetCurrentDayEvent(calendarId).thenAccept(this::addEvents).exceptionally(e -> {
