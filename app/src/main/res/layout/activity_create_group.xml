@@ -17,114 +17,135 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:dividerPadding="8dp">
 
             <!-- Group Name -->
-            <EditText
-                android:id="@+id/editTextGroupName"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Group Name"
-                android:inputType="textPersonName" />
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundMode="outline">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextGroupName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- About -->
-            <EditText
-                android:id="@+id/editTextAbout"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="About"
-                android:inputType="textMultiLine"
-                android:minLines="3" />
+                android:layout_marginTop="8dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundMode="outline">
 
-            <!-- Color Picker Section -->
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:minLines="3" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Color Picker -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Group Color"
                     android:textSize="16sp"
-                    android:layout_marginEnd="8dp"/>
+                    android:layout_marginEnd="8dp" />
 
                 <Spinner
                     android:id="@+id/spinnerGroupColor"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
-                <!-- Color Preview -->
                 <View
                     android:id="@+id/viewColorPreview"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="8dp"
-                    android:background="#3070a3"
-                    android:layout_gravity="center"/>
+                    android:background="#3070a3" />
             </LinearLayout>
-
 
             <!-- Visibility -->
             <Spinner
                 android:id="@+id/spinnerVisibility"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <LinearLayout
-                android:layout_marginTop="16dp"
-                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+
+            <!-- Members Section -->
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:text="Members:"
+                android:textStyle="bold"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp" />
 
-                <!-- Members List ScrollView -->
-                <TextView
+            <ScrollView
+                android:id="@+id/scrollMembers"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#f0f0f0">
+
+                <LinearLayout
+                    android:id="@+id/layoutSelectedMembers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Members:"
-                    android:textStyle="bold"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="8dp" />
+                    android:orientation="vertical"
+                    android:padding="8dp" />
+            </ScrollView>
 
-                <ScrollView
-                    android:id="@+id/scrollMembers"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:background="#f0f0f0">
+            <!-- Edit Members Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSelectMembers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit Members"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"
+                app:cornerRadius="24dp"
+                app:iconPadding="8dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
-                    <LinearLayout
-                        android:id="@+id/layoutSelectedMembers"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="8dp" />
-                </ScrollView>
-
-
-                <Button
-                    android:id="@+id/btnSelectMembers"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Edit Members" />
-            </LinearLayout>
-
-
-            <!-- Submit Button -->
-            <Button
+            <!-- Save Group Button -->
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Save Group"
-                android:layout_marginTop="16dp" />
-            <Button
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"
+                app:cornerRadius="24dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <!-- Cancel Button (Red Style) -->
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancelGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?attr/colorError"
-                android:text="Cancel" />
+                android:text="Cancel"
+                android:layout_marginTop="8dp"
+                android:layout_gravity="center_horizontal"
+                app:cornerRadius="24dp"
+                style="@style/Widget.MaterialComponents.FloatingActionButton"
+                android:textColor="?attr/colorError" />
+
+
         </LinearLayout>
     </ScrollView>
-
-
 </LinearLayout>

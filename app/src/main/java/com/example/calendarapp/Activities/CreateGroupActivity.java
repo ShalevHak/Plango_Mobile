@@ -23,6 +23,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.calendarapp.API.API;
 import com.example.calendarapp.API.Interfaces.Group;
 import com.example.calendarapp.Managers.GroupsManager;
 import com.example.calendarapp.Managers.UsersManager;
@@ -58,6 +59,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     private String originalGroupId;
 
     private Group currentGroup = new Group("");
+    private String currentUserEmail = "";
 
 
     @Override
@@ -70,9 +72,9 @@ public class CreateGroupActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        
+
         initActivity();
-        
+
     }
 
     private void initActivity() {
@@ -114,7 +116,8 @@ public class CreateGroupActivity extends AppCompatActivity {
         if (selectedMembers != null && !selectedMembers.isEmpty()) {
             updateMembersUI();
         }
-
+        // Fetch current user's email for permission checks
+        fetchCurrUserEmail();
 
         btnSelectMembers.setOnClickListener(v -> showSelectMembersDialog());
 
@@ -127,7 +130,14 @@ public class CreateGroupActivity extends AppCompatActivity {
             updateFormFields();
         }
     }
-
+    private void fetchCurrUserEmail(){
+        API.api().usersService.getMe()
+                .thenAccept(res -> currentUserEmail = res.user.getEmail())
+                .exceptionally(e -> {
+                    Log.e("CreateGroupActivity", "Failed to fetch current user", e);
+                    return null;
+                });
+    }
     private void updateFormFields() {
         GroupsManager.getInstance().getGroupById(originalGroupId)
                 .thenAccept(group ->{
@@ -320,24 +330,49 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     private void refreshEditMembersDialogUI(LinearLayout layout, HashMap<String, String> members) {
         layout.removeAllViews();
-        for (String email : members.keySet()) {
+        for (String memberEmail : members.keySet()) {
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setPadding(0, 8, 0, 8);
 
             TextView emailView = new TextView(this);
-            emailView.setText(email);
+            emailView.setText(memberEmail);
             emailView.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+            Spinner roleSpinner = new Spinner(this);
+            ArrayAdapter<String> roleAdapter = new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_dropdown_item, Group.Roles);
+            roleSpinner.setAdapter(roleAdapter);
+            int pos = Arrays.asList(Group.Roles).indexOf(members.get(memberEmail));
+            if (pos < 0) pos = 0;
+            roleSpinner.setSelection(pos);
+            roleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    members.put(memberEmail, Group.Roles[position]);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) { }
+            });
+
 
             Button removeBtn = new Button(this);
             removeBtn.setText("Remove");
             removeBtn.setOnClickListener(v -> {
-                members.remove(email);
-                refreshEditMembersDialogUI(layout, members);
+                if (!memberEmail.equalsIgnoreCase(currentUserEmail)) {
+                    members.remove(memberEmail);
+                    refreshEditMembersDialogUI(layout, members);
+                } else {
+                    Toast.makeText(this, "You cannot remove yourself", Toast.LENGTH_SHORT).show();
+                }
             });
 
             row.addView(emailView);
-            row.addView(removeBtn);
+            row.addView(roleSpinner);
+            if (!memberEmail.equalsIgnoreCase(currentUserEmail)) {
+                row.addView(removeBtn);
+            }
             layout.addView(row);
         }
     }
@@ -360,7 +395,8 @@ public class CreateGroupActivity extends AppCompatActivity {
             row.setPadding(0, 8, 0, 8);
 
             TextView emailView = new TextView(this);
-            emailView.setText(email);
+            String role = selectedMembers.get(email);
+            emailView.setText(email + " (" + role + ")");
             emailView.setLayoutParams(new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
