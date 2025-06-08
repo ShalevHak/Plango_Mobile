@@ -31,20 +31,21 @@ public class GroupsFragment extends Fragment {
     private void showGroupActionDialog() {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Group Options")
-                .setItems(new CharSequence[]{"Create Group", "Join Group"}, (dialog, which) -> {
+                .setItems(new CharSequence[]{"Create Group"/*, "Join Group"*/}, (dialog, which) -> {
                     if (which == 0) {
                         // Start CreateGroupActivity
                         Intent intent = new Intent(requireContext(), CreateGroupActivity.class);
                         intent.putExtra("source_activity", "ContentActivity");
                         startActivity(intent);
-                    } else if (which == 1) {
-                        // Show placeholder dialog
-                        new AlertDialog.Builder(requireContext())
-                                .setTitle("Coming Soon")
-                                .setMessage("Join Group is under development.")
-                                .setPositiveButton("OK", null)
-                                .show();
                     }
+//                    else if (which == 1) {
+//                        // Show placeholder dialog
+//                        new AlertDialog.Builder(requireContext())
+//                                .setTitle("Coming Soon")
+//                                .setMessage("Join Group is under development.")
+//                                .setPositiveButton("OK", null)
+//                                .show();
+//                    }
                 })
                 .show();
     }
