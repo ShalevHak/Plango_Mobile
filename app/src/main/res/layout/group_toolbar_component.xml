@@ -33,13 +33,4 @@
         android:background="@android:color/transparent"
         app:tint="?attr/colorSecondaryText"
         android:src="@drawable/icon_group_calendar_48" />
-
-    <ImageButton
-        android:id="@+id/btnGroupUpdates"
-        android:layout_weight="1"
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        app:tint="?attr/colorSecondaryText"
-        android:background="@android:color/transparent"
-        android:src="@drawable/icon_updates_48" />
 </LinearLayout>

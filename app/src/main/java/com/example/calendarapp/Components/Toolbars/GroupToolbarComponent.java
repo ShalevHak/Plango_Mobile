@@ -27,7 +27,7 @@ import com.example.calendarapp.Fragments.Groups.GroupUpdatesFragment;
 import com.example.calendarapp.R;
 
 public class GroupToolbarComponent extends AbstractToolbarComponent implements IComponent {
-    private ImageButton btnGroupInfo, btnGroupCalendar, btnGroupUpdates, btnGoBackFromGroup;
+    private ImageButton btnGroupInfo, btnGroupCalendar, btnGoBackFromGroup;
 
 
     public GroupToolbarComponent(Context context) {
@@ -55,7 +55,7 @@ public class GroupToolbarComponent extends AbstractToolbarComponent implements I
     };
     @Override
     protected void resetAllButtonsBut(ImageButton activeButton) {
-        ImageButton[] allButtons = {btnGroupInfo, btnGroupCalendar, btnGroupUpdates};
+        ImageButton[] allButtons = {btnGroupInfo, btnGroupCalendar};
         for (ImageButton button : allButtons) {
             if (button != activeButton) {
                 button.setEnabled(true);
@@ -68,7 +68,6 @@ public class GroupToolbarComponent extends AbstractToolbarComponent implements I
     protected Class<? extends Fragment> getFragmentClassForButtonId(int id) {
         if (id == R.id.btnGroupInfo) return GroupInfoFragment.class;
         if (id == R.id.btnGroupCalendar) return GroupCalendarFragment.class;
-        if (id == R.id.btnGroupUpdates) return GroupUpdatesFragment.class;
         return GroupInfoFragment.class;
     }
 
@@ -82,12 +81,10 @@ public class GroupToolbarComponent extends AbstractToolbarComponent implements I
         LayoutInflater.from(context).inflate(R.layout.group_toolbar_component, this);
         btnGroupInfo = findViewById(R.id.btnGroupInfo);
         btnGroupCalendar = findViewById(R.id.btnGroupCalendar);
-        btnGroupUpdates = findViewById(R.id.btnGroupUpdates);
         btnGoBackFromGroup = findViewById(R.id.btnGoBackFromGroup);
 
         btnGroupInfo.setOnClickListener(changeFragment);
         btnGroupCalendar.setOnClickListener(changeFragment);
-        btnGroupUpdates.setOnClickListener(changeFragment);
         btnGoBackFromGroup.setOnClickListener(goBackToContentActivity);
 
         if (selectedBtnId == 0) {
