@@ -29,7 +29,6 @@ public class AuthComponent extends LinearLayout implements IComponent {
     private View signInView, signUpView,  toggleAutoLink;
 
     private Button btnAuth;
-    private GoogleAuthComponent googleAutoComponent;
     private EditText etName, etEmail, etPassword, etConfirmPassword;
     private CheckBox cbShowPassword;
     private API api;
@@ -72,8 +71,7 @@ public class AuthComponent extends LinearLayout implements IComponent {
         etPassword = view.findViewById(R.id.etSignInPassword);
         etConfirmPassword = new EditText(getContext()); // To ensure not null
         btnAuth = view.findViewById(R.id.btnSignIn);
-        googleAutoComponent = view.findViewById(R.id.GoogleAutoSignIn);
-        toggleAutoLink = view.findViewById(R.id.flLinkToSignUp);
+        toggleAutoLink = view.findViewById(R.id.llLinkToSignUp);
         cbShowPassword = view.findViewById(R.id.cbShowPassword);
         initListeners();
     }
@@ -83,8 +81,7 @@ public class AuthComponent extends LinearLayout implements IComponent {
         etPassword = view.findViewById(R.id.etSignUpPassword);
         etConfirmPassword = view.findViewById(R.id.etConfirmPassword);
         btnAuth = view.findViewById(R.id.btnSignUp);
-        googleAutoComponent = view.findViewById(R.id.GoogleAutoSignUp);
-        toggleAutoLink = view.findViewById(R.id.flLinkToSignIn);
+        toggleAutoLink = view.findViewById(R.id.llLinkToSignIn);
         cbShowPassword = view.findViewById(R.id.cbShowPasswords);
         initListeners();
     }
@@ -124,7 +121,6 @@ public class AuthComponent extends LinearLayout implements IComponent {
     private void setClickableButtons(boolean isClickable){
         btnAuth.setClickable(isClickable);
         toggleAutoLink.setClickable(isClickable);
-        googleAutoComponent.setClickableGoogleAuthBtn(isClickable);
     }
 
     private void handleSignIn() {
@@ -193,7 +189,6 @@ public class AuthComponent extends LinearLayout implements IComponent {
     }
     private void openLink() {
         isSignIn = !isSignIn;
-        googleAutoComponent.setIsSignIn(isSignIn);
         toggleMode(isSignIn);
         initViews();
     }

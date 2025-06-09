@@ -96,52 +96,51 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="32dp"
         android:text="SIGN IN"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/layoutSignUpLink"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cbShowPassword" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layoutSignUpLink"
+        android:id="@+id/layoutSignInLink"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/GoogleAutoSignIn"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSignIn">
         <!-- Sign-Up Text -->
         <TextView
             android:id="@+id/tvNoAccount"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+
             android:text="Don't have an account?"
 
             android:textColor="?attr/colorHintText"
-
             android:textSize="14sp"
-            android:layout_marginLeft="80dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/llLinkToSignUp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/flLinkToSignUp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Sign-Up Link Container -->
         <LinearLayout
-            android:id="@+id/flLinkToSignUp"
+            android:id="@+id/llLinkToSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="80dp"
-            android:gravity="center"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center"
             android:padding="12dp"
-            app:layout_constraintStart_toEndOf="@+id/tvNoAccount"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvNoAccount"
+            app:layout_constraintTop_toTopOf="parent">
 
             <!-- Sign-Up Link -->
             <TextView
@@ -156,21 +155,4 @@
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-    <!-- google auto -->
-    <com.example.calendarapp.Components.auth.GoogleAuthComponent
-        android:id="@+id/GoogleAutoSignIn"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginBottom="64dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent">
-
-    </com.example.calendarapp.Components.auth.GoogleAuthComponent>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
