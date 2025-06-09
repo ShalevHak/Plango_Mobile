@@ -117,4 +117,27 @@ public class GroupsService extends AbstractAPIService<GroupHelper>{
         });
         return future;
     }
+
+    public CompletableFuture<HandlerResponse<List<Group>>> searchGroupByName(String name) {
+        CompletableFuture<HandlerResponse<List<Group>>> future = new CompletableFuture<>();
+        Call<HandlerResponse<List<Group>>> call = fetchingHelper.searchGroupByName(name);
+
+        call.enqueue(new Callback<HandlerResponse<List<Group>>>() {
+            @Override
+            public void onResponse(Call<HandlerResponse<List<Group>>> call, Response<HandlerResponse<List<Group>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    future.complete(response.body());
+                } else {
+                    future.completeExceptionally(new Exception(parseError(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<HandlerResponse<List<Group>>> call, Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+
+        return future;
+    }
 }

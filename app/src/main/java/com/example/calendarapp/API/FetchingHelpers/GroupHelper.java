@@ -5,6 +5,8 @@ import com.example.calendarapp.API.Interfaces.Group;
 import com.example.calendarapp.API.Responses.DefaultResponse;
 import com.example.calendarapp.API.Responses.HandlerResponse;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -26,4 +28,7 @@ public interface GroupHelper {
     Call<HandlerResponse<Group>> updateGroup(@Path("groupId") String originalGroupId, @Body Group group);
     @GET("{groupId}")
     Call<HandlerResponse<Group>> getGroupById(@Path("groupId") String groupId);
+
+    @GET("search")
+    Call<HandlerResponse<List<Group>>> searchGroupByName(@Query("name") String name);
 }

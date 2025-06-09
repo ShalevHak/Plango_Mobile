@@ -139,4 +139,33 @@ public class GroupsManager {
                 );
         return future;
     }
+    public CompletableFuture<List<Group>> getGroupsByName(String name) {
+        CompletableFuture<List<Group>> future = new CompletableFuture<>();
+        API.api().groupsService.searchGroupByName(name)
+                .thenAccept(res -> {
+                    if(!"success".equals(res.status) || res.data == null) {
+                        future.completeExceptionally(new Exception("No groups found"));
+                    } else {
+                        future.complete(res.data);
+                    }
+                })
+                .exceptionally(e -> { future.completeExceptionally(e); return null; });
+        return future;
+    }
+    public CompletableFuture<Void> joinGroup(Group group) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        API.api().usersService.getMe().thenAccept(userResponse -> {
+            String email = userResponse.user.getEmail();
+            HashMap<String, String> members = new HashMap<>(group.getMembers());
+            if(!members.containsKey(email)) {
+                members.put(email, Group.MEMBER);
+                Group updatedGroup = new Group(group.getName(), group.getAbout(), group.getColor(), group.getVisibility(), members);
+                updateGroup(group.getId(), updatedGroup).thenAccept(g -> future.complete(null))
+                        .exceptionally(e -> { future.completeExceptionally(e); return null; });
+            } else {
+                future.completeExceptionally(new Exception("Already a member"));
+            }
+        }).exceptionally(e -> { future.completeExceptionally(e); return null; });
+        return future;
+    }
 }

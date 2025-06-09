@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/editGroupNameSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter group name" />
+
+    <ListView
+        android:id="@+id/listGroupsResults"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:choiceMode="singleChoice" />
+
+    <TextView
+        android:id="@+id/textNoGroupsFound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No groups found with this name"
+        android:visibility="gone"
+        android:gravity="center"
+        android:paddingTop="8dp"/>
+</LinearLayout>
