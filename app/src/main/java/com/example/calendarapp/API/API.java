@@ -10,13 +10,24 @@ import com.example.calendarapp.API.Services.UsersService;
 import com.example.calendarapp.API.TokenManagement.TokenManager;
 
 public class API {
-    private static final String PROTOCOL = "http";
-    private static final String API_IP = "192.168.137.1";
-    private static final String API_PORT = "8000";
+    // *Local host config*
+    //    private static final String PROTOCOL = "http";
+//    private static final String API_IP = "172.21.112.1";
+//    private static final String API_PORT = "8000";
+//    private static final String BASE_ROUTE = "/api/v1-dev/";
+//
+//    public static String getRoute(String route) {
+//        return PROTOCOL + "://" + API_IP + ":" + API_PORT + BASE_ROUTE + route + "/";
+//    }
+
+    // *Render Host Config*
+    private static final String PROTOCOL = "https";
+    private static final String API_IP = "plango-api-mobile-dev.onrender.com";
+    // REMOVE PORT — HTTPS runs on default port 443
     private static final String BASE_ROUTE = "/api/v1-dev/";
 
     public static String getRoute(String route) {
-        return PROTOCOL + "://" + API_IP + ":" + API_PORT + BASE_ROUTE + route + "/";
+        return PROTOCOL + "://" + API_IP + BASE_ROUTE + route + "/";
     }
 
     private static API api;
